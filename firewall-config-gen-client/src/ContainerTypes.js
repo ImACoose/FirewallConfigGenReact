@@ -90,7 +90,7 @@ const ContainerTypes = {
             InputType: "text",
             Name: "WAN Upload Bandwidth (KBPS)",
             Required: true,
-            Validation: "range",
+            Validation: "bps",
         },
 
         WANDownloadKBPS: {
@@ -98,7 +98,7 @@ const ContainerTypes = {
             InputType: "text",
             Name: "WAN Download Bandwidth (KBPS)",
             Required: true,
-            Validation: "range",
+            Validation: "bps",
         },
 
         ForticloudAccEmail: {
@@ -129,8 +129,10 @@ const ContainerTypes = {
     VLANInformation: {
         Name: "Vlan Information",
         VLANID: {
+            ID: "VLANID",
             InputType: "text",
             Name: "Vlan ID",
+            Validation: "vlanId"
         },
     },
 

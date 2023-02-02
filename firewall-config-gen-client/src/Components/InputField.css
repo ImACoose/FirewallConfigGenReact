@@ -18,12 +18,6 @@ select {
     display:none;
 }
 
-.error {
-    border: 1px solid rgb(192, 61, 61);
-    background: rgb(95, 116, 185);
-    font-size: xx-large;
-}
-
 input[type="checkbox"]{
     cursor:pointer;
 }
@@ -53,7 +47,7 @@ input[type="text"]:hover, input[type="password"]:hover, select:hover, input[type
     border: 2px solid rgb(158, 116, 166);
 }
 /* border: 1px solid rgb(158, 116, 166);*/
-input[type="text"].error,  input[type="password"].error select.error{
+input[type="text"].error,  input[type="password"].error, select.error{
     border: 2px solid rgb(192, 61, 61);
 }
 

@@ -12,15 +12,18 @@ var lastHoveredElement;
 const errMsgs = {
     ipv4: "Must be a valid IP Address",
     text: "Must contain only alphanumeric characters, -, _ and be between " + minimum + " - " + maximum + " characters long with no spaces",
-    vID: "Must be between or equal to 2 and 4095",
+    vlanId: "Must be between or equal to 2 and 4095",
     portNo: "Must be between or equal to 1 and 65353",
+    password: "Must be between 4 - 15 characters",
+    suffix: "Must be a valid address",
+    bps: "Must be between or equal to 5000000 and 1000000000"
 }
 
 const regex = {
     ipv4: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
     text: /^[a-zA-Z0-9_-]{4,15}$/,
     password: /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{4,15}$/g,
-    vlanId: /^[2-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-4][0][0-9][0-4]$/,
+    //vlanId: /^[2-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-4][0][0-9][0-4]$/,
     suffix: /\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b/g,
 }
 
@@ -41,7 +44,7 @@ class FireWallDetailsForm extends React.Component{
             // when someone adds a new subtype, this should handle what ID they are
             incrementID: 0,
             vlanIncrement: 0,
-
+            pfIncremenet: 0,
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -50,9 +53,20 @@ class FireWallDetailsForm extends React.Component{
         this.updateHover = this.updateHover.bind(this);
     }
 
-  
+    validateRange(element, minimum, maximum){
+        var match = true
+        if (element.value <= maximum && element.value >= minimum){
+            match = true
+        }
+        else{
+            match = false
+        }
+        return match
+    }
 
     validateElement(element){
+        console.log("validating")
+        console.log(element)
         // first, find the validation type of that element
         // to do this, we need to find the Container
         // with how things are set out, needs to be the grandparent (element stored in label, stored in div, stored in container)
@@ -67,11 +81,21 @@ class FireWallDetailsForm extends React.Component{
         const spanElement = label.getElementsByTagName('span')[0]
         console.log(label.childNodes)
         console.log(spanElement)
-
+        console.log(validationType)
         if (regexUsed){
             if (!regexUsed.test(element.value)){
                 match = false
             }
+        }
+        else if (validationType == "vlanId"){
+            match = this.validateRange(element, 2, 4095)
+        }
+        else if (validationType == "portNo"){
+            match = this.validateRange(element, 1, 65353)
+        }
+        else if (validationType == "bps"){
+            match = this.validateRange(element, 5000000, 1000000000)
+            console.log(match)
         }
 
         if (match == false){
@@ -84,8 +108,8 @@ class FireWallDetailsForm extends React.Component{
             element.classList.remove('error')
             spanElement.classList.add('hide')
         }
-
         console.log(element.classList)
+        return match;
     }
 
 
@@ -109,6 +133,14 @@ class FireWallDetailsForm extends React.Component{
     removeContainer(event){
         if (lastHoveredElement.id != "FirewallDefaults"){
             // probably save the names in the table too
+            var oldTable = this.state.fields
+            var index = oldTable.indexOf(lastHoveredElement.id)
+            if (index > -1){
+                var newTable = oldTable.splice(index, 1)
+                this.setState({
+                    fields: newTable
+                })
+            }
         }
     }
 
@@ -131,6 +163,13 @@ class FireWallDetailsForm extends React.Component{
         const selectElements = document.body.getElementsByTagName("select")
 
         console.log(inputElements)
+
+        for (var i = 0; i < inputElements.length; i++){
+            var match = this.validateElement(inputElements[i])
+            if (match == false){
+                ableToSubmit = false
+            }
+        }
         // validate each one, find them in the containerTypes
         // mark error, return whether able to submit
         return ableToSubmit
@@ -302,7 +341,7 @@ class FireWallDetailsForm extends React.Component{
                 <button type ='button' onClick={()=> addContainer("VLANInformation")}> Click me! </button>
                 {// need to declare type = button, otherwise it will act as a submit button
                 }
-                <button type ='button' onClick={()=> addContainer("VLANInformation")}> Remove me! </button>
+                <button type ='button' onClick={()=> this.removeContainer()}> Remove me! </button>
                 <button type = 'submit'> Submit </button>
             </form>
         )

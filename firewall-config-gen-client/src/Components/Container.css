@@ -16,6 +16,14 @@
     text-align: center;
 }
 
+.FirewallDefaults {
+    height: 2000px;
+}
+
+.VLANInformation {
+    height: 400px;
+}
+
 .Container:hover {
     border: 2px solid rgb(158, 116, 166);
     box-shadow: 5px 5px 0 0 rgb(124, 92, 135);
