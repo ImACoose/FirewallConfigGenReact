@@ -127,6 +127,10 @@ class FireWallDetailsForm extends React.Component{
     validateAll(){
         var ableToSubmit = true
         // find way to grab all elements currently in DOM
+        const inputElements = document.body.getElementsByTagName("input")
+        const selectElements = document.body.getElementsByTagName("select")
+
+        console.log(inputElements)
         // validate each one, find them in the containerTypes
         // mark error, return whether able to submit
         return ableToSubmit
