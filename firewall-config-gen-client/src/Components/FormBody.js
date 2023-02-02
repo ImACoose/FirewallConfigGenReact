@@ -124,6 +124,14 @@ class FireWallDetailsForm extends React.Component{
         console.log(lastHoveredElement.id)
     }
 
+    validateAll(){
+        var ableToSubmit = true
+        // find way to grab all elements currently in DOM
+        // validate each one, find them in the containerTypes
+        // mark error, return whether able to submit
+        return ableToSubmit
+    }
+
     updateData = (name, value) =>{
         var newFormData = this.state.formData;
         newFormData[name] = value
@@ -158,22 +166,28 @@ class FireWallDetailsForm extends React.Component{
 
     handleSubmit(event){
         event.preventDefault();
-        //console.log(this.state.formData);
+        var ableToSubmit = this.validateAll();
 
-        // send  a request to this specific URL
-        fetch('http://localhost:3001/express_server', {
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json'
-            },
-            // correct way to use
-            body: JSON.stringify(this.state.formData)
-        }).then((response) => response.json()) 
-        .then((result)=>{
-            console.log(result)
-        })
+        if (ableToSubmit == true){
+            // send  a request to this specific URL
+            fetch('http://localhost:3001/express_server', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                // correct way to use
+                body: JSON.stringify(this.state.formData)
+            }).then((response) => response.json()) 
+            .then((result)=>{
+                console.log(result)
+            })
 
-        console.log(`The data has been submitted`);
+            console.log(`The data has been submitted`);
+
+        }
+        else {
+            console.log("not able to submit")
+        }
 
     }
         // Need to work out how to map inside of those arrays
