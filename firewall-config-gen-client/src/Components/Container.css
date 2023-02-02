@@ -1,0 +1,24 @@
+.Container {
+    width: 60%;
+    height: 2000px;
+    max-width:80%;
+    width:600px; /*will change to 600px when doing the other options*/
+    /* MARGINS MAY BE REASON FOR LACK OF CENTERING*/
+    margin-left: auto;
+    margin-top:10px;
+    margin-bottom:10px;
+    margin-right: auto;
+    background-color: rgb(253, 250, 255);
+    border-radius: 5px;
+    display:grid;
+    grid-template-columns: repeat(1,auto);
+    padding: 20px 10px;
+    text-align: center;
+}
+
+.Container:hover {
+    border: 2px solid rgb(158, 116, 166);
+    box-shadow: 5px 5px 0 0 rgb(124, 92, 135);
+    border-width: 2px;
+}
+

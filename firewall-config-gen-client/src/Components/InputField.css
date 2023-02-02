@@ -1,0 +1,62 @@
+select {
+    width: 90%;
+    padding-top: 15px;
+    padding-bottom:15px;
+    border:none;
+    background: rgb(255, 255, 255);
+    border-radius: 3px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:10px;
+    margin-bottom:10px;
+    cursor:pointer;
+    font-size: medium;
+    height: 10
+}
+
+.hide {
+    display:none;
+}
+
+.error {
+    border: 1px solid rgb(192, 61, 61);
+    background: rgb(95, 116, 185);
+    font-size: xx-large;
+}
+
+input[type="checkbox"]{
+    cursor:pointer;
+}
+
+label {
+    font-size:medium;
+    display:grid;
+    grid-template-columns: repeat(1,auto);
+}
+
+input[type="text"], input[type="checkbox"], input[type="password"] {
+    width: 90%;
+    padding-top: 15px;
+    padding-bottom:15px;
+    border:none;
+    background: rgb(255, 255, 255);
+    border-radius: 3px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:10px;
+    margin-bottom:10px;
+    color:black;
+    font-size: medium;
+}
+
+input[type="text"]:hover, input[type="password"]:hover, select:hover, input[type="text"]:hover.error, input[type="password"]:hover.error, select:hover.error {
+    border: 2px solid rgb(158, 116, 166);
+}
+/* border: 1px solid rgb(158, 116, 166);*/
+input[type="text"].error,  input[type="password"].error select.error{
+    border: 2px solid rgb(192, 61, 61);
+}
+
+.err {
+    color: red;
+}

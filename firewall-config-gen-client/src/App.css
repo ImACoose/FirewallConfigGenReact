@@ -1,0 +1,19 @@
+
+.header{
+  width:100%;
+  background-color: rgb(139, 109, 174);
+  padding: 15px 22px;
+  color:white;
+  margin-left: auto;
+  margin-right: auto;
+  overflow:hidden;
+}
+
+.newbodywhodis {
+  display: inline-block; /* that puts them on the same line as the thing before it?*/
+  background-color: purple;
+}
+
+.App-link {
+  color: #61dafb;
+}
