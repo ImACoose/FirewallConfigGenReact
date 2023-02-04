@@ -7,6 +7,7 @@ import ContainerTypes from '../ContainerTypes.js'
 
 const minimum = 4
 const maximum = 15
+const numberRegex = /\d+/g;
 var lastHoveredElement;
 
 const errMsgs = {
@@ -41,6 +42,11 @@ class FireWallDetailsForm extends React.Component{
         this.state = {
             formData: {},
             fields: ["FirewallDefaults", "Hello"],
+            savedOptionals: {
+                VLAN: [],
+                PF:[],
+            },
+            // curly = object, square = array
             // when someone adds a new subtype, this should handle what ID they are
             incrementID: 0,
             vlanIncrement: 0,
@@ -65,23 +71,20 @@ class FireWallDetailsForm extends React.Component{
     }
 
     validateElement(element){
-        console.log("validating")
-        console.log(element)
+        
         // first, find the validation type of that element
         // to do this, we need to find the Container
         // with how things are set out, needs to be the grandparent (element stored in label, stored in div, stored in container)
         const Container = element.parentElement.parentElement.parentElement
+        const ContainerName = Container.id.replace(/\d+/g, '');
 
-        const validationType = ContainerTypes[Container.id][element.id].Validation
+
+        const validationType = ContainerTypes[ContainerName][element.id].Validation
         var match = true
         const regexUsed = regex[validationType]
         const label = element.parentElement;
-        console.log(label)
         
         const spanElement = label.getElementsByTagName('span')[0]
-        console.log(label.childNodes)
-        console.log(spanElement)
-        console.log(validationType)
         if (regexUsed){
             if (!regexUsed.test(element.value)){
                 match = false
@@ -133,24 +136,87 @@ class FireWallDetailsForm extends React.Component{
     removeContainer(event){
         if (lastHoveredElement.id != "FirewallDefaults"){
             // probably save the names in the table too
-            var oldTable = this.state.fields
-            var index = oldTable.indexOf(lastHoveredElement.id)
-            if (index > -1){
-                var newTable = oldTable.splice(index, 1)
-                this.setState({
-                    fields: newTable
-                })
+            // need to grab all the optionals
+            const baseID = lastHoveredElement.id.replace(numberRegex, '')
+            if (baseID == "VLANInformation"){
+                // grab all vlans?
+                var VLANS = [];
+                // need to start at 1, because the VLANS start at 1, not 0, and therefore
+                // the max needs to be increment + 1
+                for (var i = 1; i < this.state.vlanIncrement + 1; i++){
+
+                    const VLAN = document.getElementById((baseID + i))
+                    console.log(VLAN)
+
+                    if (VLAN.id != lastHoveredElement.id){
+                        const inputs = VLAN.getElementsByTagName("input");
+                        const selects = VLAN.getElementsByTagName("select");
+
+                        var obj = {}
+                        for (var j = 0; j < inputs.length; j++){
+                            const ID = inputs[j].id
+                            const value = inputs[j].value
+                            obj[ID] = value
+                        }
+
+                        for (var j = 0; j < selects.length; j++){
+                            const ID = selects[j].id
+                            const value = selects[j].value
+                            obj[ID] = value
+                        }
+
+                        VLANS.push(obj)
+                        console.log("printing table")
+                        console.log(VLANS)
+
+                    }
+                }
+
+                
+                var oldTable = this.state.fields
+                var index = oldTable.indexOf(baseID)
+
+
+                if (index > -1){
+                    console.log("index found")
+                    console.log(VLANS)
+                    // need to grab the old saved optionals
+
+                    const saved = this.state.savedOptionals
+                    var newSaved = saved 
+                    newSaved["VLAN"] = VLANS
+
+                    oldTable.splice(index, 1)
+                    this.setState({
+                        fields: oldTable,
+                        savedOptionals: newSaved, 
+                    })
+                }
+
+                console.log(this.state.savedOptionals.VLAN)
+                
             }
+
         }
     }
 
     updateHover(event){
         console.log("ran")
         const container = event.target;
-        if ( ContainerTypes[container.id]){
+        console.log(event.target)
+        const numberRegex = /\d+/g;
+        const baseID = container.id.replace(numberRegex, '');
+        const parentID = container.parentElement.id.replace(numberRegex, '')
+        const gGGrandparentID = container.parentElement.parentElement.parentElement.id.replace(numberRegex, '')
+
+
+        if ( ContainerTypes[baseID]){
             lastHoveredElement = container;
         }
-        else if (ContainerTypes[container.parentElement.parentElement.parentElement.id]){
+        else if (ContainerTypes[parentID]){
+            lastHoveredElement = container.parentElement;
+        }
+        else if (ContainerTypes[gGGrandparentID]){
             lastHoveredElement = container.parentElement.parentElement.parentElement;
         }
         console.log(lastHoveredElement.id)
@@ -189,22 +255,12 @@ class FireWallDetailsForm extends React.Component{
     // need to save them upon validation and hitting submit
     handleChange = (event) => {
         const target = event.target;
+        console.log("checking type")
+        console.log(target.type)
 
-        this.validateElement(target)
-
-        /*
-        const name = target.name;
-
-        var newFormData = this.state.formData;
-        newFormData[name] = target.value
-
-        console.log("Updating")
-        this.setState({
-            formData: newFormData,
-        })
-
-        //console.log (this.state.formData);
-        */
+        if (target.type !== "select"){
+            this.validateElement(target)
+        }
     }
 
     handleSubmit(event){
@@ -264,13 +320,15 @@ class FireWallDetailsForm extends React.Component{
                                 else if (item === "VLANInformation"){
                                     if (vlanCounter < itemIncrement){
                                         vlanCounter++
+                                        containerID = item + vlanCounter
                                     }
                                 }
                             }
 
                             var containerName = "";
+                            const newClass = "Container " + item
                             return (
-                                <CreateContainer containerID = {containerID} onMouseEnter={updateHover}>
+                                <CreateContainer containerID = {containerID} className = {newClass} onMouseEnter={updateHover}>
                                     {
                                         
                                         // for each object in the field, create an input
