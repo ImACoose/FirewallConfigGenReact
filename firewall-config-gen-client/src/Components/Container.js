@@ -1,10 +1,10 @@
 import './Container.css'
 
-function CreateContainer({containerID, onMouseEnter, children}){
+function CreateContainer({containerID, className, onMouseEnter, children}){
     console.log(containerID)
 
     return(
-        <div id={containerID} className='Container' onMouseEnter={onMouseEnter}>
+        <div id={containerID} className={className} onMouseEnter={onMouseEnter}>
             {children}
         </div>
     )

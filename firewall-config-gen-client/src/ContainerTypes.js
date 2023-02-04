@@ -1,14 +1,18 @@
+// Please read the notes
+
 const ContainerTypes = {
     FirewallDefaults:
     {
+        // This is what is displayed as the header of the form section to the client
         Name: "System Settings",
 
+        // the rest are individual fields displayed to the client
         HostName: {
-            ID: "HostName",
-            InputType: "text",
-            Name: "Hostname",
-            Required: true,
-            Validation: "text",
+            ID: "HostName", // how it's referenced for validation
+            InputType: "text", // whether it's a text input or select input (haven't accounted for checkboxes yet :( )
+            Name: "Hostname", // what is displayed to the client, and sent to the server (hopefully can change that to ID)
+            Required: true, //useless i think
+            Validation: "text", // the validation type, important for determining which method/regex to use
         },
         
         AdminUsername: {
