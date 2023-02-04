@@ -49,6 +49,4 @@ app.post("/generate", (req, res) => {
   return res.json({"success": success});
 })
 
-generateConfig({"Hostname": "test-fw01"})
-
 app.listen(port, () => console.log(`listening on port ${port}`));
