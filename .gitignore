@@ -41,3 +41,4 @@ Thumbs.db
 __pycache__
 output/**
 !output/.keep
+node_modules
