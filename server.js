@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const nunjucks = require("nunjucks");
-const fs = require("fs")
+const fs = require("fs");
 
 const app = express();
 const port = process.env.port || 3001;
@@ -41,12 +41,12 @@ app.post("/generate", (req, res) => {
   var success = generateConfig(configFormJSON);
 
   if (success) { 
-    res.status(200)
+    res.status(200);
   } else {
-    res.status(500)
+    res.status(500);
   };
 
   return res.json({"success": success});
-})
+});
 
 app.listen(port, () => console.log(`listening on port ${port}`));
