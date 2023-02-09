@@ -18,7 +18,7 @@ const errMsgs = {
     portNo: "Must be between or equal to 1 and 65353",
     password: "Must be between 4 - 15 characters",
     suffix: "Must be a valid address",
-    bps: "Must be between or equal to 5000000 and 1000000000"
+    bps: "Must be between or equal to 1000 and 1000000"
 }
 
 const regex = {
@@ -117,7 +117,7 @@ z
             match = this.validateRange(element, 1, 65353)
         }
         else if (validationType == "bps"){
-            match = this.validateRange(element, 5000000, 1000000000)
+            match = this.validateRange(element, 1000, 1000000)
             console.log(match)
         }
 
@@ -228,10 +228,13 @@ z
 
         console.log(inputElements)
 
+
         for (var i = 0; i < inputElements.length; i++){
-            var match = this.validateElement(inputElements[i])
-            if (match == false){
-                ableToSubmit = false
+            if (inputElements[i].id != "reader") {
+                var match = this.validateElement(inputElements[i])
+                if (match == false){
+                    ableToSubmit = false
+                }
             }
         }
         // validate each one, find them in the containerTypes
