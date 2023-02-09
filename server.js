@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const nunjucks = require("nunjucks");
 const fs = require("fs");
+const { config } = require("process");
 
 const app = express();
 const port = process.env.port || 3001;
@@ -17,9 +18,19 @@ app.use(cors({
 
 function generateConfig(configFormJSON) {
     var hostname = configFormJSON.FirewallDefaults["HostName"];
+    var adminUsername = configFormJSON.FirewallDefaults["AdminUsername"];
+    var dnsSuffix = configFormJSON.FirewallDefaults["DNSSuffix"];
+    var primaryIPv4DNS = configFormJSON.FirewallDefaults["PrimaryIPv4DNS"];
+    var secondaryIPv4DNS = configFormJSON.FirewallDefaults["SecondaryIpv4DNS"];
+    var model = configFormJSON.FirewallDefaults["Model"];
+    var streetAddress = configFormJSON.FirewallDefaults["StreetAddress"];
+    var snmpCommunity = configFormJSON.FirewallDefaults["SNMPCommunity"];
+    var WANConnectionType = configFormJSON.FirewallDefaults["WANConnectionType"];
+    var WANUploadKbps = configFormJSON.FirewallDefaults["WANUploadKBPS"];
+    var WANDownloadKbps = configFormJSON.FirewallDefaults["WANDownloadKBPS"];
+    var forticloudAccEmail = configFormJSON.FirewallDefaults["ForticloudAccEmail"];
+    var timezone = configFormJSON.FirewallDefaults["Timezone"]
     var vlans = {};
-
-    console.log(configFormJSON)
 
     for (const configIndex in configFormJSON) {
       var configIndexSplit = configIndex.split("VLANInformation");
@@ -30,14 +41,14 @@ function generateConfig(configFormJSON) {
         };
       };
     };
-
-    console.log(vlans)
     
     var success = true;
 
     const template = templateEngine.render("40F.fgt", {
       hostname: hostname,
-      vlans: vlans
+      vlans: vlans,
+      timezone: timezone,
+      adminUsername: adminUsername
     });
 
     fs.writeFile(`./output/${hostname}.fgt`, template, function(err) {
