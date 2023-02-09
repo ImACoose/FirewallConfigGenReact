@@ -1,6 +1,7 @@
 // Please read the notes
 
 const ContainerTypes = {
+    // Container Type
     FirewallDefaults:
     {
         // This is what is displayed as the header of the form section to the client

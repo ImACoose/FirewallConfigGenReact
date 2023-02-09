@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import NotAnApp from './App';
 import FireWallDetailsForm from './Components/FormBody';
 import {RenderHeader} from './App';
 import CreateContainer from './Components/Container';

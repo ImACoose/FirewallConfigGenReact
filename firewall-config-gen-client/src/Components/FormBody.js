@@ -8,6 +8,7 @@ import ContainerTypes from '../ContainerTypes.js'
 const minimum = 4
 const maximum = 15
 const numberRegex = /\d+/g;
+var initialised = false;
 var lastHoveredElement;
 
 const errMsgs = {
@@ -41,11 +42,30 @@ class FireWallDetailsForm extends React.Component{
 
         this.state = {
             formData: {},
-            fields: ["FirewallDefaults", "Hello"],
-            savedOptionals: {
-                VLAN: [],
-                PF:[],
-            },
+            /*
+            formData: {
+                FirewallDefaults: [
+                    hostname: 'abcd'
+                    Admin Username: 'brycey'
+                ]
+z
+                VlanInformation1: [
+                    VlanID: 123,
+                ]
+
+                VlanInformation2: [
+
+                ]
+
+                PortForwarding1: [
+
+                ]
+            }
+            
+            
+            
+            
+            */
             // curly = object, square = array
             // when someone adds a new subtype, this should handle what ID they are
             incrementID: 0,
@@ -122,14 +142,32 @@ class FireWallDetailsForm extends React.Component{
     // are loaded inside of a new container
 
     addContainer(containerType){
+        const oldSaved = this.state.formData
+        var newSaved = oldSaved
+
         var increment = IncrementMapping[containerType]
         const newID = this.state[increment] + 1
-        const newfields = this.state.fields.concat(containerType)
+        const containerID = containerType + newID
+
+        newSaved[containerID] = {}
+
+        Object.keys(ContainerTypes[containerType]).map(function(keyname, keyindex){
+            if (ContainerTypes[containerType][keyname].Name){
+                if (ContainerTypes[containerType][keyname].InputType == "text"){
+                    newSaved[containerID][keyname] = "";
+                }
+                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "select"){
+                    newSaved[containerID][keyname] = ContainerTypes[containerType][keyname].SelectOptions[0];
+                }
+            }
+        })
 
         this.setState({
-            fields: newfields,
+            formData: newSaved,
             [increment]: newID,
         })
+
+        console.log(this.state.formData)
 
     }
 
@@ -139,61 +177,22 @@ class FireWallDetailsForm extends React.Component{
             // need to grab all the optionals
             const baseID = lastHoveredElement.id.replace(numberRegex, '')
             if (baseID == "VLANInformation"){
-                // grab all vlans?
-                var VLANS = [];
-                // need to start at 1, because the VLANS start at 1, not 0, and therefore
-                // the max needs to be increment + 1
-                for (var i = 1; i < this.state.vlanIncrement + 1; i++){
+                // grab it from the formData table
 
-                    const VLAN = document.getElementById((baseID + i))
-                    console.log(VLAN)
+                const oldTable = this.state.formData
+                //var index = oldTable.indexOf(lastHoveredElement.id) -- doesn't work with object
+                var increment = IncrementMapping[baseID]
+                var newIncrement = this.state[increment] -1 
 
-                    if (VLAN.id != lastHoveredElement.id){
-                        const inputs = VLAN.getElementsByTagName("input");
-                        const selects = VLAN.getElementsByTagName("select");
+                var newTable = oldTable
+                delete(newTable[lastHoveredElement.id])
 
-                        var obj = {}
-                        for (var j = 0; j < inputs.length; j++){
-                            const ID = inputs[j].id
-                            const value = inputs[j].value
-                            obj[ID] = value
-                        }
+                this.setState({
+                    formData: newTable,
+                    [increment]: newIncrement,
+                })
 
-                        for (var j = 0; j < selects.length; j++){
-                            const ID = selects[j].id
-                            const value = selects[j].value
-                            obj[ID] = value
-                        }
-
-                        VLANS.push(obj)
-                        console.log("printing table")
-                        console.log(VLANS)
-
-                    }
-                }
-
-                
-                var oldTable = this.state.fields
-                var index = oldTable.indexOf(baseID)
-
-
-                if (index > -1){
-                    console.log("index found")
-                    console.log(VLANS)
-                    // need to grab the old saved optionals
-
-                    const saved = this.state.savedOptionals
-                    var newSaved = saved 
-                    newSaved["VLAN"] = VLANS
-
-                    oldTable.splice(index, 1)
-                    this.setState({
-                        fields: oldTable,
-                        savedOptionals: newSaved, 
-                    })
-                }
-
-                console.log(this.state.savedOptionals.VLAN)
+                console.log(this.state.formData)
                 
             }
 
@@ -254,18 +253,44 @@ class FireWallDetailsForm extends React.Component{
     // so far, elements are only saved through onBlurring 
     // need to save them upon validation and hitting submit
     handleChange = (event) => {
+        console.log("handling change")
+        const FormData = this.state.formData;
+
         const target = event.target;
-        console.log("checking type")
-        console.log(target.type)
+        const gggParent = target.parentElement.parentElement.parentElement
+        var NewData = FormData
+        NewData[gggParent.id][target.id] = target.value
+        console.log(NewData[gggParent.id][target.id])
+
+
+        this.setState({formData: NewData})
+    }
+
+    handleBlur = (event) => {
+        console.log("handling blur")
+        const FormData = this.state.formData;
+
+        const target = event.target;
+        const gggParent = target.parentElement.parentElement.parentElement
+        var NewData = FormData
+        NewData[gggParent.id][target.id] = target.value
+        console.log(NewData[gggParent.id][target.id])
 
         if (target.type !== "select"){
             this.validateElement(target)
         }
+
+        this.setState({formData: NewData})
+
+        console.log(this.state.formData)
     }
 
+
     handleSubmit(event){
+        console.log(this.state.formData)
         event.preventDefault();
         var ableToSubmit = this.validateAll();
+        ableToSubmit = true
 
         if (ableToSubmit == true){
             // send  a request to this specific URL
@@ -289,6 +314,32 @@ class FireWallDetailsForm extends React.Component{
         }
 
     }
+
+    InitFormData(){
+        var NewData = {}
+        NewData["FirewallDefaults"] = {}
+
+        Object.keys(ContainerTypes.FirewallDefaults).map(function(keyname, keyindex){
+            if (ContainerTypes.FirewallDefaults[keyname].Name){
+                if (ContainerTypes.FirewallDefaults[keyname].InputType == "text"){
+                    NewData["FirewallDefaults"][keyname] = "";
+                }
+                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "select"){
+                    NewData["FirewallDefaults"][keyname] = ContainerTypes.FirewallDefaults[keyname].SelectOptions[0];
+                }
+            }
+        })
+
+        this.setState({
+            formData: NewData
+        })
+
+        console.log("DOne initilialising")
+        initialised = true
+        console.log(this.state.formData)
+    }
+
+    
         // Need to work out how to map inside of those arrays
         // need to work out how to pass 'this' through multiple thoughs
 
@@ -297,32 +348,30 @@ class FireWallDetailsForm extends React.Component{
         const addContainer = this.addContainer
         const updateData = this.updateData
         const updateHover = this.updateHover
-        var optionsCounter = 0;
-        var vlanCounter = 0;
-        var PFCounter = 0;
+        const handleBlur = this.handleBlur
+        const formData = this.state.formData
+        var baseContainers = this.state.savedOptionals
+        console.log(baseContainers)
+
+        console.log(this.state.formData)
+        if (initialised === false){
+            console.log("Initialising")
+            this.InitFormData();
+        }
 
         return(
             <form onSubmit={this.handleSubmit}>
                 { 
-                    this.state.fields.map((item)=>{
+                    Object.keys(this.state.formData).map((ID)=>{
                         // if the field exists in the container type, render it
-                        if (ContainerTypes[item]) {
-                            var containerID = item
-                            var itemIncrement = IncrementMapping[item]
-                            if (itemIncrement) {
-                                itemIncrement = this.state[IncrementMapping[item]]
+                        const item = ID.replace(numberRegex, '')
 
-                                if (item === "FirewallOptions"){
-                                    if (optionsCounter < itemIncrement){
-                                        optionsCounter++;
-                                    }
-                                }
-                                else if (item === "VLANInformation"){
-                                    if (vlanCounter < itemIncrement){
-                                        vlanCounter++
-                                        containerID = item + vlanCounter
-                                    }
-                                }
+                        if (ContainerTypes[item]) {
+                            var containerID = ID
+                            var Numbers = containerID.match(numberRegex)
+
+                            if (Numbers) {
+                                console.log(Numbers)
                             }
 
                             var containerName = "";
@@ -338,14 +387,11 @@ class FireWallDetailsForm extends React.Component{
                                                 
                                                 var itemIncrement = IncrementMapping[item]
                                                 if (itemIncrement) {
-                                                    containerName = ContainerTypes[item][keyname] + " No. " + vlanCounter
-
+                                                    containerName = ContainerTypes[item][keyname] + " " + Numbers[0]
                                                 }
                                                 else{
-
                                                     containerName = ContainerTypes[item][keyname]
                                                 }
-
 
                                                 return(
                                                     <h1> {containerName}</h1>
@@ -355,12 +401,12 @@ class FireWallDetailsForm extends React.Component{
                                                 // sort out the naming scheme here, used for indexing on the back end, so very important
                                                 var itemName = "";
                                                 if (containerName !== "System Settings"){
-                                                    itemName = ContainerTypes[item][keyname].Name + " " + vlanCounter;
+                                                    itemName = ContainerTypes[item][keyname].Name + " " + Numbers[0]
                                                 }
                                                 else{
                                                     itemName = ContainerTypes[item][keyname].Name 
                                                 }
-
+                                                
                                                 // select is handled differently from other input
                                                 if (ContainerTypes[item][keyname].InputType === "select"){
                                                     return(
@@ -375,12 +421,23 @@ class FireWallDetailsForm extends React.Component{
                                                     )
                                                 }
                                                 else{
+                                                    //checks whether there's a value to import
+                                                    const otherID = ContainerTypes[item][keyname].ID;
+                                                    var valueToImport = "";
+
+                                                    console.log(ID)
+                                                    console.log(otherID)
+                                                    console.log(ContainerTypes[item][keyname])
+                                                    console.log(formData[ID][otherID])
+
                                                     return(
                                                         <CreateInput
                                                         id = {ContainerTypes[item][keyname].ID}
                                                         name = {itemName}
                                                         type = {ContainerTypes[item][keyname].InputType}
-                                                        onBlur={handleChangeEvent}
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChangeEvent}
+                                                        importedValue = {formData[ID][otherID]}
                                                         >
                                                         </CreateInput>
                                                     )
