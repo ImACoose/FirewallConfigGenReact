@@ -2,3 +2,7 @@ config system global
  set hostname {{ hostname }}
  next
 end
+
+{% for name, vlan in vlans %}
+vlanID: {{ vlan.vlanID }}
+{% endfor %}

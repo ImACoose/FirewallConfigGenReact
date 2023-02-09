@@ -16,11 +16,26 @@ app.use(cors({
 }));
 
 function generateConfig(configFormJSON) {
-    var hostname = configFormJSON["Hostname"];
+    var hostname = configFormJSON.FirewallDefaults["HostName"];
+    var vlans = {};
+
+    for (const configIndex in configFormJSON) {
+      var configIndexSplit = configIndex.split("VLANInformation");
+
+      if (configIndexSplit[0] === "") {
+        vlans[configIndex] = {
+          vlanID: configFormJSON[configIndex].VLANID
+        };
+      };
+    };
+
+    console.log(vlans)
+    
     var success = true;
 
     const template = templateEngine.render("40F.fgt", {
-      hostname: hostname
+      hostname: hostname,
+      vlans: vlans
     });
 
     fs.writeFile(`./output/${hostname}.fgt`, template, function(err) {
