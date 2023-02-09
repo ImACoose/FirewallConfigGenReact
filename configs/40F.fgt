@@ -1,0 +1,4 @@
+config system global
+ set hostname {{ hostname }}
+ next
+end

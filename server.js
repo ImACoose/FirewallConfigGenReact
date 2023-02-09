@@ -1,16 +1,52 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
+const nunjucks = require("nunjucks");
+const fs = require("fs");
+
 const app = express();
 const port = process.env.port || 3001;
 
-// This ensures same origin policy won't block the client, who is running on a different port
+const templateEngine = nunjucks.configure("./configs", {
+  autoescape: true
+});
+
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000'
-}))
+    origin: "http://localhost:3000"
+}));
 
-app.post('/express_server', (req, res) => { //Line 9
-    res.json({ express: 'YOUR EXPRESS SERVER IS CONNECTED TO REACT' + req.body }); //Line 10
-  }); //Line 11
+function generateConfig(configFormJSON) {
+    var hostname = configFormJSON["Hostname"];
+    var success = true;
 
-app.listen(port, ()=> console.log(`listening on port ${port}`));
+    const template = templateEngine.render("40F.fgt", {
+      hostname: hostname
+    });
+
+    fs.writeFile(`./output/${hostname}.fgt`, template, function(err) {
+      if (err) {
+        success = false;
+      };
+    }); 
+
+    return success;
+};
+
+app.post('/express_server', (req, res) => {
+    res.json({ express: 'YOUR EXPRESS SERVER IS CONNECTED TO REACT' + req.body });
+});
+
+app.post("/generate", (req, res) => {
+  const configFormJSON = req.body;
+  var success = generateConfig(configFormJSON);
+
+  if (success) { 
+    res.status(200);
+  } else {
+    res.status(500);
+  };
+
+  return res.json({"success": success});
+});
+
+app.listen(port, () => console.log(`listening on port ${port}`));
