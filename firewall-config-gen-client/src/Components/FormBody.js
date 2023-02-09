@@ -3,6 +3,7 @@ import CreateInput from './InputField';
 import CreateContainer from './Container';
 import React from 'react';
 import ContainerTypes from '../ContainerTypes.js'
+import { JSON } from 'mysql/lib/protocol/constants/types';
 // use multiple dots to go back further levels ./ for one, ../ for two
 
 const minimum = 4
@@ -40,31 +41,28 @@ class FireWallDetailsForm extends React.Component{
     constructor(props){
         super(props)
 
+        var NewData = {}
+        NewData["FirewallDefaults"] = {}
+
+        Object.keys(ContainerTypes.FirewallDefaults).map(function(keyname, keyindex){
+            if (ContainerTypes.FirewallDefaults[keyname].Name){
+                if (ContainerTypes.FirewallDefaults[keyname].InputType == "text"){
+                    NewData["FirewallDefaults"][keyname] = "";
+                }
+                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "select"){
+                    NewData["FirewallDefaults"][keyname] = ContainerTypes.FirewallDefaults[keyname].SelectOptions[0];
+                }
+            }
+        })
+
         this.state = {
-            formData: {},
+            formData: NewData,
             /*
             formData: {
                 FirewallDefaults: [
                     hostname: 'abcd'
                     Admin Username: 'brycey'
                 ]
-z
-                VlanInformation1: [
-                    VlanID: 123,
-                ]
-
-                VlanInformation2: [
-
-                ]
-
-                PortForwarding1: [
-
-                ]
-            }
-            
-            
-            
-            
             */
             // curly = object, square = array
             // when someone adds a new subtype, this should handle what ID they are
@@ -182,7 +180,12 @@ z
                 const oldTable = this.state.formData
                 //var index = oldTable.indexOf(lastHoveredElement.id) -- doesn't work with object
                 var increment = IncrementMapping[baseID]
-                var newIncrement = this.state[increment] -1 
+                const containerNumber = lastHoveredElement.id.match(numberRegex)
+                var newIncrement = this.state[increment]
+
+                if (containerNumber == newIncrement){
+                    newIncrement = this.state[increment] -1
+                }
 
                 var newTable = oldTable
                 delete(newTable[lastHoveredElement.id])
@@ -191,9 +194,6 @@ z
                     formData: newTable,
                     [increment]: newIncrement,
                 })
-
-                console.log(this.state.formData)
-                
             }
 
         }
@@ -201,7 +201,6 @@ z
 
     updateHover(event){
         const container = event.target;
-        console.log(event.target)
         const numberRegex = /\d+/g;
         const baseID = container.id.replace(numberRegex, '');
         const parentID = container.parentElement.id.replace(numberRegex, '')
@@ -217,7 +216,6 @@ z
         else if (ContainerTypes[gGGrandparentID]){
             lastHoveredElement = container.parentElement.parentElement.parentElement;
         }
-        console.log(lastHoveredElement.id)
     }
 
     validateAll(){
@@ -225,9 +223,6 @@ z
         // find way to grab all elements currently in DOM
         const inputElements = document.body.getElementsByTagName("input")
         const selectElements = document.body.getElementsByTagName("select")
-
-        console.log(inputElements)
-
 
         for (var i = 0; i < inputElements.length; i++){
             if (inputElements[i].id != "reader") {
@@ -245,14 +240,12 @@ z
     // so far, elements are only saved through onBlurring 
     // need to save them upon validation and hitting submit
     handleChange = (event) => {
-        console.log("handling change")
         const FormData = this.state.formData;
 
         const target = event.target;
         const gggParent = target.parentElement.parentElement.parentElement
         var NewData = FormData
         NewData[gggParent.id][target.id] = target.value
-        console.log(NewData[gggParent.id][target.id])
 
 
         this.setState({formData: NewData})
@@ -265,8 +258,6 @@ z
         const gggParent = target.parentElement.parentElement.parentElement
         var NewData = FormData
         NewData[gggParent.id][target.id] = target.value
-        console.log(NewData[gggParent.id][target.id])
-
         if (target.type !== "select"){
             this.validateElement(target)
         }
@@ -304,43 +295,96 @@ z
 
     }
 
+    ExportData = (e) => {
+        e.preventDefault();
+        const element = document.createElement("a");
+        const DataToExport = this.state.formData
+
+        var newString = ""; // this will be what is exported to a text file
+        const entries = Object.entries(DataToExport)
+
+        // for each container in the form
+        for (let i = 0; i < entries.length; i++){
+            console.log(entries[i])
+            const container = entries[i]
+            const containerName = container[0]
+            const containerFields = container[1]
+
+            //concat a new container field
+            newString = newString.concat("", containerName, "=", "{")
+
+            // this sorts it into containers and their fields
+            const keyValues = Object.entries(containerFields)
+
+            // then concat all the fields inside
+            for (let j = 0; j < keyValues.length; j++){
+                const objID = keyValues[j][0]
+                const objValue = keyValues[j][1]
+                newString = newString.concat(objID, ":", objValue)
+
+                // if it's at the end, close off the bracket, else, insert a comma
+                if (j + 1 == keyValues.length){
+                    newString = newString.concat("}")
+                }
+                else{
+                    newString = newString.concat(",")
+                }
+            }
+
+            if (i + 1 != entries.length){
+                newString = newString.concat(";")
+            }
+        }
+        // create a new file, using the newString as the value to export. by default, this is set to import in that same format
+        const file = new Blob([newString], {type:'text/plain'})
+        element.href = URL.createObjectURL(file);
+        element.download = "FirewallConfig.txt";
+        document.body.appendChild(element); // Required for this to work in FireFox
+        element.click();
+    }
+
+    // imports configs from a text file -- hasn't been validated properly yet
     ImportData = (e) => {
         e.preventDefault();
         const reader = new FileReader()
+        var containers = {};
+
         reader.onload = (e) => {
             const text = e.target.result
             console.log(text)
+            const sections = text.split(';')
+            console.log(sections)
+            
+            for (let i = 0; i < sections.length; i++){
+                const HeaderAndValues = sections[i].split('=');
+                console.log(HeaderAndValues);
+                const containerName = HeaderAndValues[0]
+                containers[containerName] = {};
+
+                const keyvalues = HeaderAndValues[1].split(',');
+
+                for (let j = 0; j < keyvalues.length; j++){
+                    const IDandValue = keyvalues[j].split(':');
+                    const ID = IDandValue[0].replace('{', '')
+                    const val = IDandValue[1].replace('}', '')
+                    containers[containerName][ID] = val
+                }
+            }
+
+            console.log(containers)
+
+            this.setState({
+                formData: containers
+            })
+
         }
         reader.readAsText(e.target.files[0])
+
         // read from a text file
         // seperate entries by a delimiter (probably a colon, maybe a comma)
         // update the state based on these values
         // check object titles, such as VLAN, FirewallDefaults etc and sort by those first
 
-    }
-
-    InitFormData(){
-        var NewData = {}
-        NewData["FirewallDefaults"] = {}
-
-        Object.keys(ContainerTypes.FirewallDefaults).map(function(keyname, keyindex){
-            if (ContainerTypes.FirewallDefaults[keyname].Name){
-                if (ContainerTypes.FirewallDefaults[keyname].InputType == "text"){
-                    NewData["FirewallDefaults"][keyname] = "";
-                }
-                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "select"){
-                    NewData["FirewallDefaults"][keyname] = ContainerTypes.FirewallDefaults[keyname].SelectOptions[0];
-                }
-            }
-        })
-
-        this.setState({
-            formData: NewData
-        })
-
-        console.log("DOne initilialising")
-        initialised = true
-        console.log(this.state.formData)
     }
 
     
@@ -353,14 +397,8 @@ z
         const updateHover = this.updateHover
         const handleBlur = this.handleBlur
         const formData = this.state.formData
-        var baseContainers = this.state.savedOptionals
-        console.log(baseContainers)
 
         console.log(this.state.formData)
-        if (initialised === false){
-            console.log("Initialising")
-            this.InitFormData();
-        }
 
         return(
             <form onSubmit={this.handleSubmit}>
@@ -372,11 +410,6 @@ z
                         if (ContainerTypes[item]) {
                             var containerID = ID
                             var Numbers = containerID.match(numberRegex)
-
-                            if (Numbers) {
-                                console.log(Numbers)
-                            }
-
                             var containerName = "";
                             const newClass = "Container " + item
                             return (
@@ -428,11 +461,6 @@ z
                                                     const otherID = ContainerTypes[item][keyname].ID;
                                                     var valueToImport = "";
 
-                                                    console.log(ID)
-                                                    console.log(otherID)
-                                                    console.log(ContainerTypes[item][keyname])
-                                                    console.log(formData[ID][otherID])
-
                                                     return(
                                                         <CreateInput
                                                         id = {ContainerTypes[item][keyname].ID}
@@ -460,6 +488,7 @@ z
                 {// need to declare type = button, otherwise it will act as a submit button
                 }
                 <button type ='button' onClick={()=> this.removeContainer()}> Remove me! </button>
+                <button type = 'button' onClick={this.ExportData}> Export! </button>
                 <CreateInput
                 type="reader"
                 onChange={this.ImportData}>
