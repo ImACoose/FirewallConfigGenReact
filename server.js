@@ -19,6 +19,8 @@ function generateConfig(configFormJSON) {
     var hostname = configFormJSON.FirewallDefaults["HostName"];
     var vlans = {};
 
+    console.log(configFormJSON)
+
     for (const configIndex in configFormJSON) {
       var configIndexSplit = configIndex.split("VLANInformation");
 
@@ -46,10 +48,6 @@ function generateConfig(configFormJSON) {
 
     return success;
 };
-
-app.post('/express_server', (req, res) => {
-    res.json({ express: 'YOUR EXPRESS SERVER IS CONNECTED TO REACT' + req.body });
-});
 
 app.post("/generate", (req, res) => {
   const configFormJSON = req.body;
