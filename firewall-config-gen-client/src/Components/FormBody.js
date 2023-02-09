@@ -200,7 +200,6 @@ z
     }
 
     updateHover(event){
-        console.log("ran")
         const container = event.target;
         console.log(event.target)
         const numberRegex = /\d+/g;
@@ -240,16 +239,6 @@ z
         return ableToSubmit
     }
 
-    updateData = (name, value) =>{
-        var newFormData = this.state.formData;
-        newFormData[name] = value
-
-        this.setState({
-            formData: newFormData,
-        })
-
-    }
-
     // so far, elements are only saved through onBlurring 
     // need to save them upon validation and hitting submit
     handleChange = (event) => {
@@ -267,7 +256,6 @@ z
     }
 
     handleBlur = (event) => {
-        console.log("handling blur")
         const FormData = this.state.formData;
 
         const target = event.target;
@@ -281,8 +269,6 @@ z
         }
 
         this.setState({formData: NewData})
-
-        console.log(this.state.formData)
     }
 
 
@@ -294,7 +280,7 @@ z
 
         if (ableToSubmit == true){
             // send  a request to this specific URL
-            fetch('http://localhost:3001/express_server', {
+            fetch('http://localhost:3001/generate', {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
@@ -312,6 +298,21 @@ z
         else {
             console.log("not able to submit")
         }
+
+    }
+
+    ImportData = (e) => {
+        e.preventDefault();
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            const text = e.target.result
+            console.log(text)
+        }
+        reader.readAsText(e.target.files[0])
+        // read from a text file
+        // seperate entries by a delimiter (probably a colon, maybe a comma)
+        // update the state based on these values
+        // check object titles, such as VLAN, FirewallDefaults etc and sort by those first
 
     }
 
@@ -346,7 +347,6 @@ z
     render(){
         const handleChangeEvent = this.handleChange
         const addContainer = this.addContainer
-        const updateData = this.updateData
         const updateHover = this.updateHover
         const handleBlur = this.handleBlur
         const formData = this.state.formData
@@ -457,6 +457,11 @@ z
                 {// need to declare type = button, otherwise it will act as a submit button
                 }
                 <button type ='button' onClick={()=> this.removeContainer()}> Remove me! </button>
+                <CreateInput
+                type="reader"
+                onChange={this.ImportData}>
+                </CreateInput>
+        
                 <button type = 'submit'> Submit </button>
             </form>
         )

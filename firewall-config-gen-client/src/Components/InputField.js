@@ -15,6 +15,13 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
             </div>
         )
     }
+    else if (type == "reader"){
+        return (
+            <div>
+                <input id = "reader" type = "file" onChange={onChange}/>
+            </div>
+        )
+    }
     else{
         console.log("The imported value is" + importedValue)
         return (
