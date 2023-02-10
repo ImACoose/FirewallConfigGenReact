@@ -125,8 +125,8 @@ const ContainerTypes = {
         checkBoxExample: {
             ID: "checkBoxExample",
             InputType: "checkbox",
-            Name: "Test check"
-        }
+            Name: "Test check",
+        },
     } ,
 
     FirewallOptions: {

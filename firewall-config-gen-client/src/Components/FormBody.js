@@ -149,12 +149,15 @@ class FireWallDetailsForm extends React.Component{
 
         newSaved[containerID] = {}
 
+        console.log(containerID)
+        console.log(containerType)
+
         Object.keys(ContainerTypes[containerType]).map(function(keyname, keyindex){
             if (ContainerTypes[containerType][keyname].Name){
                 if (ContainerTypes[containerType][keyname].InputType == "text"){
                     newSaved[containerID][keyname] = "";
                 }
-                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "select"){
+                else if (ContainerTypes[containerType][keyname].InputType == "select"){
                     newSaved[containerID][keyname] = ContainerTypes[containerType][keyname].SelectOptions[0];
                 }
             }
@@ -464,7 +467,9 @@ class FireWallDetailsForm extends React.Component{
                                                 else{
                                                     //checks whether there's a value to import
                                                     const otherID = ContainerTypes[item][keyname].ID;
-                                                    var valueToImport = "";
+                                                    console.log(otherID)
+                                                    console.log(ContainerTypes[item][keyname])
+                                                    console.log(ContainerTypes[item][keyname].InputType)
 
                                                     return(
                                                         <CreateInput
