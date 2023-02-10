@@ -145,10 +145,69 @@ const ContainerTypes = {
             Name: "Vlan ID",
             Validation: "vlanId"
         },
+
+        IPv4Address: {
+            ID: "IPv4Address",
+            InputType: "text",
+            Name: "IPv4 Address",
+            Validation: "ipv4",
+        },
+
+        CIDR: {
+            ID: "CIDR",
+            InputType: "select",
+            Name: "CIDR",
+            SelectOptions: ["/30", "/29", "/28", "/27", "/26", "/25", "/24"],
+        },
+
+        DHCPv4Enabled: {
+            ID: "DHCPv4Enabled",
+            InputType: "Checkbox",
+            Name: "DHCPv4 Enabled",
+        },
+
+        // required/enabled if dhcpv4 is enabled
+        DHCPv4StartAddress: {
+            ID: "DHCPv4StartAddress",
+            InputType: "text",
+            Name: "DHCPv4 Start Address",
+            Validation: "ipv4",
+        },
+        // same rules as start address
+        DHCPv4EndAddress: {
+            ID: "DHCPv4EndAddress",
+            InputType: "text",
+            Name: "DHCPv4 End Address",
+            Validation: "ipv4",
+        }
+
+
     },
 
     PortForwardingInfo: {
         Name: "Port Forwarding Information",
+
+        // ipv4 altered - optional, but if something is there, must fit ipv4 regex
+        SourceIpv4Address: {
+            ID: "SourceIpv4Address",
+            InputType: "text",
+            Name: "Source Ipv4 Address",
+            Validation: "ipv4Altered",
+        },
+
+        DestinationIpv4Address: {
+            ID: "DestinationIpv4Address",
+            InputType: "text",
+            Name: "Destination Ipv4 Address",
+            Validation: "ipv4",
+        },
+
+        PortNumber:{
+            ID: "PortNumber",
+            InputType: "text",
+            Name: "Port Number",
+            Validation: "portNo",
+        },
     },
 
     IPSecVPNTunnel: {
