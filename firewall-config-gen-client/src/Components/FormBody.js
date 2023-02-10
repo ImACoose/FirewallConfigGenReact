@@ -245,8 +245,13 @@ class FireWallDetailsForm extends React.Component{
         const target = event.target;
         const gggParent = target.parentElement.parentElement.parentElement
         var NewData = FormData
-        NewData[gggParent.id][target.id] = target.value
 
+        if (target.type == "checkbox"){
+            NewData[gggParent.id][target.id] = target.checked
+        }        
+        else{
+            NewData[gggParent.id][target.id] = target.value
+        }
 
         this.setState({formData: NewData})
     }

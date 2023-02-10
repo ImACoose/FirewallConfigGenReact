@@ -121,6 +121,12 @@ const ContainerTypes = {
             SelectOptions: ["AEST", "ACST"],
             Required: true,
         },
+
+        checkBoxExample: {
+            ID: "checkBoxExample",
+            InputType: "checkbox",
+            Name: "Test check"
+        }
     } ,
 
     FirewallOptions: {

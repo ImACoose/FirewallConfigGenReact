@@ -22,6 +22,17 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
             </div>
         )
     }
+    else if (type="checkbox"){
+        return (
+            <div>
+                <label> {name}<input id = {id} type = "checkbox" onChange={onChange}/></label>
+           
+            </div>
+        )
+    }
+    else if (type="checkboxGroup"){
+
+    }
     else{
         console.log("The imported value is" + importedValue)
         return (
