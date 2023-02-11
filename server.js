@@ -37,6 +37,8 @@ function generateConfig(configFormJSON) {
     var timezone = configFormJSON.FirewallDefaults["Timezone"]
     var vlans = {};
 
+    console.log(configFormJSON)
+
     for (const configIndex in configFormJSON) {
       var configIndexSplit = configIndex.split("VLANInformation");
 
@@ -48,8 +50,6 @@ function generateConfig(configFormJSON) {
     };
 
     timezone = timezone_map[timezone];
-
-    console.log(timezone);
     
     var success = true;
 

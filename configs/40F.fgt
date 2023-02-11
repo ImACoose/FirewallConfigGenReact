@@ -55,7 +55,7 @@ config system interface
         set mtu-override disable
         set status up
     next
-{% for name, vlan in vlans -%}
+    {% for name, vlan in vlans -%}
     edit "VLAN{{ vlan.vlanID }}"
         set vdom "root"
         set mode static
@@ -70,5 +70,5 @@ config system interface
         set vlanid {{ vlan.vlanID }}
         set status up
     next
+    {% endfor -%}
 end
-{% endfor -%}
