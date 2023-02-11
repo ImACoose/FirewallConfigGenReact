@@ -182,7 +182,14 @@ const ContainerTypes = {
             InputType: "text",
             Name: "DHCPv4 End Address",
             Validation: "ipv4",
-        }
+        },
+
+        Zone: {
+            ID: "Zone",
+            InputType: "select",
+            Name: "Zone",
+            SelectOptions: ["Trust", "Untrust"],
+        },
     },
 
     VLANInformation: {
@@ -227,14 +234,25 @@ const ContainerTypes = {
             InputType: "text",
             Name: "DHCPv4 End Address",
             Validation: "ipv4",
-        }
+        },
 
-
+        Zone: {
+            ID: "Zone",
+            InputType: "select",
+            Name: "Zone",
+            SelectOptions: ["Trust", "Untrust"],
+        },
     },
 
     PortForwardingInfo: {
         Name: "Port Forwarding Information",
 
+        Protocol: {
+            ID: "Protocol",
+            InputType: "select",
+            Name: "Protocol (TCP/UDP)",
+            SelectOptions: ["TCP", "UDP"],
+        },
         // ipv4 altered - optional, but if something is there, must fit ipv4 regex
         SourceIpv4Address: {
             ID: "SourceIpv4Address",
@@ -250,16 +268,89 @@ const ContainerTypes = {
             Validation: "ipv4",
         },
 
-        PortNumber:{
-            ID: "PortNumber",
+        ExPortNumber:{
+            ID: "ExPortNumber",
             InputType: "text",
-            Name: "Port Number",
+            Name: "External Port Number",
             Validation: "portNo",
         },
+
+        IntPortNumber: {
+            ID: "Internal Port Number",
+            InputType: "text",
+            Name: "Internal Port Number",
+            Validation: "portNo",
+        },
+
+
     },
 
-    IPSecVPNTunnel: {
-        Name: "IP Security VPN Tunnel Information"
+    VPNInformation: {
+        Name: "IP Security VPN Tunnel Information",
+        // need a way to break this into sections?
+        // IKE Configuration
+        RemoteIPv4Address: {
+            ID: "RemoteIPv4Address",
+            InputType: "text",
+            Name: "Remote Ipv4 Address",
+            Validation: "ipv4",
+        },
+
+        PreSharedKey: {
+            ID: "PreSharedKey",
+            InputType: "text",
+            Name: "Pre-shared Key",
+            Validation: "text",
+        },
+
+        Encryption: {
+            ID: "Encryption",
+            InputType: "select",
+            Name: "Select Encryption",
+            SelectOptions: ["AES-CBC-256", "AES-CBC-128"],
+        },
+
+        Authentication: {
+            ID: "Authentication",
+            InputType: "select",
+            Name: "Select Authentication",
+            SelectOptions: ["SHA-256", "SHA-512"],
+        },
+
+        DHGroup: {
+            ID: "DHGroup",
+            InputType: "checkboxGroup",
+            Name: "Select DH Group",
+            checkboxArray: ["1","2","5","14","15","16","17","18","19","20","21","27", "28","29","30","31","32"],
+        },
+
+        KeyLifetime: {
+            ID: "KeyLifetime",
+            InputType: "text",
+            Name: "Key Lifetime (Seconds)",
+            Validation: "text",
+        },
+
+        // IPSecurity Configuration?
+
+        LocalIPv4Address: {
+            ID: "LocalIPv4Address",
+            InputType: "text",
+            Name: "Local Ipv4 Address",
+            Validation: "ipv4",
+        },
+
+        LocalIPv4Subnet: {
+            ID: "LocalIPv4Subnet",
+            InputType: "select",
+            Name: "Local subnet prefix",
+            SelectOptions: ["/30", "/29", "/28", "/27", "/26", "/25", "/24"],
+        }
+
+
+
+
+
     }
 
 
