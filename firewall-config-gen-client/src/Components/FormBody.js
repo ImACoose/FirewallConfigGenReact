@@ -136,7 +136,7 @@ class FireWallDetailsForm extends React.Component{
     validateElement(element){
         var match = true
         // ensure the element is not a checkbox or select
-        if (!element.type === "select" && !element.type == "checbox"){
+        if (!element.type === "select" && !element.type == "checkbox"){
             // first, find the validation type of that element
             // to do this, we need to find the Container
             // with how things are set out, needs to be the grandparent (element stored in label, stored in div, stored in container)
@@ -399,7 +399,31 @@ class FireWallDetailsForm extends React.Component{
             for (let j = 0; j < keyValues.length; j++){
                 const objID = keyValues[j][0]
                 const objValue = keyValues[j][1]
-                newString = newString.concat(objID, ":", objValue)
+                console.log(objID)
+                console.log(objValue)
+
+                if (typeof(objValue) === 'object'){
+                    console.log("found an object!")
+                    newString = newString.concat(objID, ':[')
+
+                    const checkboxArray = Object.entries(objValue)
+
+                    for (let k = 0; k < checkboxArray.length; k++){
+                        const checkboxID = checkboxArray[k][0]
+                        const checkboxVal = checkboxArray[k][1]
+                        
+                        newString = newString.concat(checkboxID, '-', checkboxVal)
+                        if (k + 1 == checkboxArray.length){
+                            newString = newString.concat("]")
+                        }
+                        else{
+                            newString = newString.concat("_")
+                        }
+                    }
+                }
+                else{
+                    newString = newString.concat(objID, ":", objValue)
+                }
 
                 // if it's at the end, close off the bracket, else, insert a comma
                 if (j + 1 == keyValues.length){
@@ -408,6 +432,7 @@ class FireWallDetailsForm extends React.Component{
                 else{
                     newString = newString.concat(",")
                 }
+
             }
 
             if (i + 1 != entries.length){
@@ -430,13 +455,9 @@ class FireWallDetailsForm extends React.Component{
 
         reader.onload = (e) => {
             const text = e.target.result
-            console.log(text)
             const sections = text.split(';')
-            console.log(sections)
-            
             for (let i = 0; i < sections.length; i++){
                 const HeaderAndValues = sections[i].split('=');
-                console.log(HeaderAndValues);
                 const containerName = HeaderAndValues[0]
                 containers[containerName] = {};
 
@@ -446,16 +467,37 @@ class FireWallDetailsForm extends React.Component{
                     const IDandValue = keyvalues[j].split(':');
                     const ID = IDandValue[0].replace('{', '')
                     const val = IDandValue[1].replace('}', '')
-                    containers[containerName][ID] = val
+                    
+                    // check whether there's a checkbox group, saved in group:[1-true_2-false] format
+                    if (val.split('_').length > 1){
+                        containers[containerName][ID] = {}
+                        const checkboxArray = val.split('_')
+                        for (let k = 0; k < checkboxArray.length; k++){
+                            const checkboxIDandValue = checkboxArray[k].split('-');
+                            const checkboxID = checkboxIDandValue[0].replace('[', '')
+                            const checkboxValue = checkboxIDandValue[1].replace(']', '')
+                            // saves the individual checkbox to the big checkbox array
+                            containers[containerName][ID][checkboxID] = checkboxValue == "true" // these get imported as strings, this converts to a bool
+                        }
+                    }
+                    else{
+                        if (val == "true" || val == "false"){
+                            containers[containerName][ID] = val == "true"
+                        }
+                        else{
+                            containers[containerName][ID] = val
+                        }
+
+                    }
                 }
             }
 
             console.log(containers)
 
+            
             this.setState({
                 formData: containers
             })
-
         }
         reader.readAsText(e.target.files[0])
 
@@ -525,13 +567,17 @@ class FireWallDetailsForm extends React.Component{
                                                 
                                                 // select is handled differently from other input
                                                 if (ContainerTypes[item][keyname].InputType === "select"){
+                                                    const otherID = ContainerTypes[item][keyname].ID;
                                                     return(
+                                                        
                                                         <CreateInput
                                                         id = {ContainerTypes[item][keyname].ID}
                                                         name = {itemName}
                                                         type = {ContainerTypes[item][keyname].InputType}
                                                         onBlur={handleChangeEvent}
+                                                        onChange={handleChangeEvent}
                                                         SelectOptions = {ContainerTypes[item][keyname].SelectOptions}
+                                                        importedValue = {formData[ID][otherID]}
                                                         >
                                                         </CreateInput>
                                                     )
@@ -547,6 +593,7 @@ class FireWallDetailsForm extends React.Component{
                                                         onBlur={handleBlur}
                                                         onChange={handleChangeEvent}
                                                         checkboxArray = {ContainerTypes[item][keyname].checkboxArray}
+                                                        importedValue = {formData[ID][otherID]}
                                                         >
                                                         </CreateInput>
                                                     )

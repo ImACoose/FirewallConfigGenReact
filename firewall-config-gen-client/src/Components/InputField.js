@@ -5,7 +5,7 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
     if (type == "select"){
         return (
             <div>
-                <label> {name}: <select id={id} name={name} onBlur={onBlur} onChange={onChange}>
+                <label> {name}: <select id={id} name={name} onBlur={onBlur} onChange={onChange} value={importedValue}>
                     {SelectOptions.map(function(optionName, Index){
                         return <option key = {Index} name={optionName}>
                             {optionName}
@@ -31,15 +31,18 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
     }
     else if (type=="checkboxGroup"){
         const arrayOfFields = checkboxArray
+        // id here is the id of the ENTIRE array
+
         return(
             <div>
                 <label> {name} </label>
                 <div className='checkboxGroup' id = {id}>
                 {arrayOfFields.map(element => {
+                    // element here will be ID of each item in the checkbox array
                     return(
                         <label>
                             {element}
-                            <input id = {element} type = "checkbox" onChange={onChange} value={importedValue}/>
+                            <input id = {element} type = "checkbox" onChange={onChange} checked={importedValue[element]}/>
                         </label>
                     )
                 })}
