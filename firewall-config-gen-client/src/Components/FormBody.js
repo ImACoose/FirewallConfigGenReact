@@ -180,12 +180,8 @@ class FireWallDetailsForm extends React.Component{
                 }
                 else if (ContainerTypes[containerType][keyname].InputType == "checkboxGroup"){
                     console.log(ContainerTypes[containerType][keyname].InputType)
-
-                    if (newSaved[containerID[keyname]] == undefined){
-                        console.log("not found")
-                        newSaved[containerID][keyname] = {}
-                    }
-                    
+                    newSaved[containerID[keyname]] = {}
+                 
                     const checkboxArray = ContainerTypes[containerType][keyname].checkboxArray
 
                     checkboxArray.forEach(element => {
