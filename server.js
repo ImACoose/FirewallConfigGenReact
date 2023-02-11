@@ -16,6 +16,11 @@ app.use(cors({
     origin: "http://localhost:3000"
 }));
 
+const timezone_map = {
+  ACST: 63,
+  AEST: 65
+};
+
 function generateConfig(configFormJSON) {
     var hostname = configFormJSON.FirewallDefaults["HostName"];
     var adminUsername = configFormJSON.FirewallDefaults["AdminUsername"];
@@ -41,6 +46,10 @@ function generateConfig(configFormJSON) {
         };
       };
     };
+
+    timezone = timezone_map[timezone];
+
+    console.log(timezone);
     
     var success = true;
 
@@ -48,7 +57,9 @@ function generateConfig(configFormJSON) {
       hostname: hostname,
       vlans: vlans,
       timezone: timezone,
-      adminUsername: adminUsername
+      admin_username: adminUsername,
+      upload_kbps: WANUploadKbps,
+      download_kbps: WANDownloadKbps
     });
 
     fs.writeFile(`./output/${hostname}.fgt`, template, function(err) {
