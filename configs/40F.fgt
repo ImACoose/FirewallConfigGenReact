@@ -41,7 +41,7 @@ config system interface
         set mtu-override disable
         set status up
     next
-        edit "lan"
+    edit "lan"
         set vdom "root"
         set mode static
         set ip {{ native_ipv4_address }} {{ native_ipv4_mask }}
