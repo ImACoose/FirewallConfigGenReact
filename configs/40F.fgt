@@ -44,7 +44,7 @@ config system interface
         edit "lan"
         set vdom "root"
         set mode static
-        set ip {{ native_vlan_ipv4 }} {{ native_vlan_ipv4_mask }}
+        set ip {{ native_ipv4_address }} {{ native_ipv4_mask }}
         set allowaccess ping https ssh fgfm fabric
         set stp enable
         set device-identification enable
@@ -56,7 +56,7 @@ config system interface
         set status up
     next
     {% for name, vlan in vlans -%}
-    edit "VLAN{{ vlan.vlanID }}"
+    edit "VLAN{{ vlan.vlan_id }}"
         set vdom "root"
         set mode static
         set ip {{ vlan.ipv4_address }} {{ vlan.ipv4_mask }}
@@ -67,8 +67,20 @@ config system interface
         set device-user-identification enable
         set role lan
         set interface "lan"
-        set vlanid {{ vlan.vlanID }}
+        set vlanid {{ vlan.vlan_id }}
         set status up
     next
-    {% endfor -%}
+    {%- endfor %}
+end
+config system zone
+    edit "z-wan"
+        set intrazone deny
+        set interface "wan"
+    next
+    {% for zone_name, interfaces in zones -%}
+    edit "z-{{ zone_name }}"
+        set intrazone deny
+        set interface {{ interfaces|safe }}
+    next
+    {%- endfor %}
 end
