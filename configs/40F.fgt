@@ -1,8 +1,74 @@
 config system global
- set hostname {{ hostname }}
- next
+    set autorun-log-fsck enable
+    set hostname {{ hostname }}
+    set log-uuid-address enable
+    set switch-controller enable
+    set timezone {{ timezone }}
 end
-
-{% for name, vlan in vlans %}
-vlanID: {{ vlan.vlanID }}
-{% endfor %}
+config webfilter profile
+    edit "default"
+        set feature-set flow
+        set log-all-url enable
+    next
+end
+config firewall shaping-profile
+    edit "default-out"
+        set default-class-id 4
+        config shaping-entries
+            edit 1
+                set class-id 4
+                set guaranteed-bandwidth-percentage 95
+                set maximum-bandwidth-percentage 99
+            next
+        end
+    next
+end
+config system interface
+    edit "wan"
+        set vdom "root"
+        set mode dhcp
+        set allowaccess ping https ssh snmp fgfm
+        set type physical
+        set outbandwidth {{ upload_kbps }}
+        set egress-shaping-profile "default-out"
+        set lldp-reception enable
+        set lldp-transmission disable
+        set estimated-upstream-bandwidth {{ upload_kbps }}
+        set estimated-downstream-bandwidth {{ download_kbps }}
+        set role wan
+        set defaultgw enable
+        set dns-server-override disable
+        set mtu-override disable
+        set status up
+    next
+        edit "lan"
+        set vdom "root"
+        set mode static
+        set ip {{ native_vlan_ipv4 }} {{ native_vlan_ipv4_mask }}
+        set allowaccess ping https ssh fgfm fabric
+        set stp enable
+        set device-identification enable
+        set device-user-identification enable
+        set lldp-reception enable
+        set lldp-transmission enable
+        set role lan
+        set mtu-override disable
+        set status up
+    next
+{% for name, vlan in vlans -%}
+    edit "VLAN{{ vlan.vlanID }}"
+        set vdom "root"
+        set mode static
+        set ip {{ vlan.ipv4_address }} {{ vlan.ipv4_mask }}
+        set allowaccess ping
+        set type vlan
+        set vlan-protocol 8021q
+        set device-identification enable
+        set device-user-identification enable
+        set role lan
+        set interface "lan"
+        set vlanid {{ vlan.vlanID }}
+        set status up
+    next
+end
+{% endfor -%}
