@@ -34,7 +34,7 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
         return(
             <div>
                 <label> {name} </label>
-                <div  className='checkboxGroup' id = {id}>
+                <div className='checkboxGroup' id = {id}>
                 {arrayOfFields.map(element => {
                     return(
                         <label>

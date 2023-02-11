@@ -244,7 +244,7 @@ const ContainerTypes = {
         },
     },
 
-    PortForwardingInfo: {
+    PFInformation: {
         Name: "Port Forwarding Information",
 
         Protocol: {
@@ -336,16 +336,63 @@ const ContainerTypes = {
         LocalIPv4Address: {
             ID: "LocalIPv4Address",
             InputType: "text",
-            Name: "Local Ipv4 Address",
+            Name: "Local Ipv4 Network Address",
             Validation: "ipv4",
         },
 
         LocalIPv4Subnet: {
             ID: "LocalIPv4Subnet",
             InputType: "select",
-            Name: "Local subnet prefix",
+            Name: "Local Subnet Prefix",
             SelectOptions: ["/30", "/29", "/28", "/27", "/26", "/25", "/24"],
-        }
+        },
+
+        RemoteIPv4NetworkAddress: {
+            ID: "RemoteIPv4NetworkAddress",
+            InputType: "text",
+            Name: "Remote Ipv4 Network Address",
+            Validation: "ipv4",
+        },
+
+        RemoteIPv4Subnet: {
+            ID: "RemoteIPv4Subnet",
+            InputType: "select",
+            Name: "Remote Subnet Prefix",
+            SelectOptions: ["/30", "/29", "/28", "/27", "/26", "/25", "/24"],
+        },
+
+        Encryption2: {
+            ID: "Encryption2",
+            InputType: "select",
+            Name: "Select Encryption",
+            SelectOptions: ["ESP-192-AES", "ESP-256-AES"],
+        },
+
+        Authentication2: {
+            ID: "Authentication2",
+            InputType: "select",
+            Name: "Select Authentication",
+            SelectOptions: ["ESP-SHA256-HMAC", "ESP-SHA512-HMAC"],
+        },
+
+        DH2Group: {
+            ID: "DH2Group",
+            InputType: "checkboxGroup",
+            Name: "Select DH Group",
+            checkboxArray: ["1","2","5","14","15","16","17","18","19","20","21","27", "28","29","30","31","32"],
+        },
+
+        Key2Lifetime: {
+            ID: "Key2Lifetime",
+            InputType: "text",
+            Name: "Key Lifetime (Seconds)",
+            Validation: "text",
+        },
+
+
+
+
+
 
 
 

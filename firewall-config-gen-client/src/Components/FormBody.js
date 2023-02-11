@@ -30,8 +30,9 @@ const regex = {
 }
 
 const IncrementMapping = {
-    FirewallOptions: "incrementID",
     VLANInformation: "vlanIncrement",
+    PFInformation: "pfIncrement",
+    VPNInformation: "vpnIncrement",
 }
 
 
@@ -108,9 +109,9 @@ class FireWallDetailsForm extends React.Component{
             */
             // curly = object, square = array
             // when someone adds a new subtype, this should handle what ID they are
-            incrementID: 0,
             vlanIncrement: 0,
-            pfIncremenet: 0,
+            pfIncrement: 0,
+            vpnIncrement: 0,
         }
 
         console.log(this.state.formData)
@@ -207,7 +208,7 @@ class FireWallDetailsForm extends React.Component{
                 }
                 else if (ContainerTypes[containerType][keyname].InputType == "checkboxGroup"){
                     console.log(ContainerTypes[containerType][keyname].InputType)
-                    newSaved[containerID[keyname]] = {}
+                    newSaved[containerID][keyname] = {}
                  
                     const checkboxArray = ContainerTypes[containerType][keyname].checkboxArray
 
@@ -236,28 +237,25 @@ class FireWallDetailsForm extends React.Component{
             // probably save the names in the table too
             // need to grab all the optionals
             const baseID = lastHoveredElement.id.replace(numberRegex, '')
-            if (baseID == "VLANInformation"){
-                // grab it from the formData table
+            // grab it from the formData table
 
-                const oldTable = this.state.formData
-                //var index = oldTable.indexOf(lastHoveredElement.id) -- doesn't work with object
-                var increment = IncrementMapping[baseID]
-                const containerNumber = lastHoveredElement.id.match(numberRegex)
-                var newIncrement = this.state[increment]
+            const oldTable = this.state.formData
+            //var index = oldTable.indexOf(lastHoveredElement.id) -- doesn't work with object
+            var increment = IncrementMapping[baseID]
+            const containerNumber = lastHoveredElement.id.match(numberRegex)
+            var newIncrement = this.state[increment]
 
-                if (containerNumber == newIncrement){
-                    newIncrement = this.state[increment] -1
-                }
-
-                var newTable = oldTable
-                delete(newTable[lastHoveredElement.id])
-
-                this.setState({
-                    formData: newTable,
-                    [increment]: newIncrement,
-                })
+            if (containerNumber == newIncrement){
+                newIncrement = this.state[increment] -1
             }
 
+            var newTable = oldTable
+            delete(newTable[lastHoveredElement.id])
+
+            this.setState({
+                formData: newTable,
+                [increment]: newIncrement,
+            })
         }
     }
 
@@ -577,9 +575,11 @@ class FireWallDetailsForm extends React.Component{
                         }     
                     })
                 }
-                <button type ='button' onClick={()=> addContainer("VLANInformation")}> Click me! </button>
+                <button type ='button' onClick={()=> addContainer("VLANInformation")}> Add VLAN! </button>
                 {// need to declare type = button, otherwise it will act as a submit button
                 }
+                <button type ='button' onClick={()=> addContainer("PFInformation")}> Add PF! </button>
+                <button type ='button' onClick={()=> addContainer("VPNInformation")}> Add VPN! </button>
                 <button type ='button' onClick={()=> this.removeContainer()}> Remove me! </button>
                 <button type = 'button' onClick={this.ExportData}> Export! </button>
                 <CreateInput
