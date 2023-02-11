@@ -140,7 +140,7 @@ class FireWallDetailsForm extends React.Component{
     validateElement(element){
         var match = true
         // ensure the element is not a checkbox or select
-        if (!element.type === "select" && !element.type == "checbox"){
+        if (!element.type === "select" && !element.type == "checkbox"){
             // first, find the validation type of that element
             // to do this, we need to find the Container
             // with how things are set out, needs to be the grandparent (element stored in label, stored in div, stored in container)
