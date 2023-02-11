@@ -3,13 +3,12 @@ import CreateInput from './InputField';
 import CreateContainer from './Container';
 import React from 'react';
 import ContainerTypes from '../ContainerTypes.js'
-import { JSON } from 'mysql/lib/protocol/constants/types';
+
 // use multiple dots to go back further levels ./ for one, ../ for two
 
 const minimum = 4
 const maximum = 15
 const numberRegex = /\d+/g;
-var initialised = false;
 var lastHoveredElement;
 
 const errMsgs = {
@@ -262,10 +261,10 @@ class FireWallDetailsForm extends React.Component{
         var ableToSubmit = true
         // find way to grab all elements currently in DOM
         const inputElements = document.body.getElementsByTagName("input")
-        const selectElements = document.body.getElementsByTagName("select")
+
 
         for (var i = 0; i < inputElements.length; i++){
-            if (inputElements[i].id != "reader") {
+            if (inputElements[i].id != "reader" && inputElements[i].type != "checkbox") {
                 var match = this.validateElement(inputElements[i])
                 if (match == false){
                     ableToSubmit = false
