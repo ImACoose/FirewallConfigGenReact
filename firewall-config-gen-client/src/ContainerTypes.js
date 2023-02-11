@@ -132,7 +132,7 @@ const ContainerTypes = {
             ID: "checkBoxGroup",
             InputType: "checkboxGroup",
             Name: "Checkbox group",
-            checkboxArray: ["1","3","5","27","32"],
+            checkboxArray: ["1","2","3","5","15","19","27","32"],
         },
     } ,
 
@@ -144,8 +144,49 @@ const ContainerTypes = {
         },
     },
 
+    // need a permanent VLAN called 'native vlan', cannot be deleted!!
+
+    NativeVLANInformation: {
+        Name: "Native VLAN Information",
+
+        IPv4Address: {
+            ID: "IPv4Address",
+            InputType: "text",
+            Name: "IPv4 Address",
+            Validation: "ipv4",
+        },
+
+        CIDR: {
+            ID: "CIDR",
+            InputType: "select",
+            Name: "CIDR",
+            SelectOptions: ["/30", "/29", "/28", "/27", "/26", "/25", "/24"],
+        },
+
+        DHCPv4Enabled: {
+            ID: "DHCPv4Enabled",
+            InputType: "Checkbox",
+            Name: "DHCPv4 Enabled",
+        },
+
+        // required/enabled if dhcpv4 is enabled
+        DHCPv4StartAddress: {
+            ID: "DHCPv4StartAddress",
+            InputType: "text",
+            Name: "DHCPv4 Start Address",
+            Validation: "ipv4",
+        },
+        // same rules as start address
+        DHCPv4EndAddress: {
+            ID: "DHCPv4EndAddress",
+            InputType: "text",
+            Name: "DHCPv4 End Address",
+            Validation: "ipv4",
+        }
+    },
+
     VLANInformation: {
-        Name: "Vlan Information",
+        Name: "Tagged Vlan Information",
         VLANID: {
             ID: "VLANID",
             InputType: "text",

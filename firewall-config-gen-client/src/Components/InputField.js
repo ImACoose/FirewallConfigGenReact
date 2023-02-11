@@ -32,7 +32,9 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
     else if (type=="checkboxGroup"){
         const arrayOfFields = checkboxArray
         return(
-            <div className='checkboxGroup' id = {id}>
+            <div>
+                <label> {name} </label>
+                <div  className='checkboxGroup' id = {id}>
                 {arrayOfFields.map(element => {
                     return(
                         <label>
@@ -41,6 +43,8 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
                         </label>
                     )
                 })}
+                </div>
+
             </div>
         )
     }
