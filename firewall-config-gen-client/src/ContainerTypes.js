@@ -127,6 +127,13 @@ const ContainerTypes = {
             InputType: "checkbox",
             Name: "Test check",
         },
+
+        checkBoxGroup: {
+            ID: "checkBoxGroup",
+            InputType: "checkboxGroup",
+            Name: "Checkbox group",
+            checkboxArray: ["1","3","5","27","32"],
+        },
     } ,
 
     FirewallOptions: {

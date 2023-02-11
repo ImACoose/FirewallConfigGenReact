@@ -1,6 +1,6 @@
 import './InputField.css'
 
-function CreateInputField ({id, name, type, onBlur, onChange, importedValue, SelectOptions}) {
+function CreateInputField ({id, name, type, onBlur, onChange, importedValue, SelectOptions, checkboxArray}) {
 
     if (type == "select"){
         return (
@@ -23,8 +23,6 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
         )
     }
     else if (type=="checkbox"){
-        console.log(type)
-        console.log("checkbox field")
         return (
             <div>
                 <label> {name}<input id = {id} type = "checkbox" onChange={onChange}/></label>
@@ -32,7 +30,19 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
         )
     }
     else if (type=="checkboxGroup"){
-
+        const arrayOfFields = checkboxArray
+        return(
+            <div className='checkboxGroup' id = {id}>
+                {arrayOfFields.map(element => {
+                    return(
+                        <label>
+                            {element}
+                            <input id = {element} type = "checkbox" onChange={onChange} value={importedValue}/>
+                        </label>
+                    )
+                })}
+            </div>
+        )
     }
     else{
         console.log("The imported value is" + importedValue)

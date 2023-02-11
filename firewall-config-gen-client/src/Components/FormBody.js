@@ -49,11 +49,27 @@ class FireWallDetailsForm extends React.Component{
                 if (ContainerTypes.FirewallDefaults[keyname].InputType == "text"){
                     NewData["FirewallDefaults"][keyname] = "";
                 }
+                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "checkbox"){
+                    NewData["FirewallDefaults"][keyname]= true
+                }
+                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "checkboxGroup"){
+                    NewData["FirewallDefaults"][keyname]= {}
+                    console.log(ContainerTypes.FirewallDefaults[keyname].InputType)
+                    
+                    const checkboxArray = ContainerTypes.FirewallDefaults[keyname].checkboxArray
+
+                    checkboxArray.forEach(element => {
+                        console.log(element)
+                        NewData["FirewallDefaults"][keyname][element] = false
+                    });
+                }
                 else if (ContainerTypes.FirewallDefaults[keyname].InputType == "select"){
                     NewData["FirewallDefaults"][keyname] = ContainerTypes.FirewallDefaults[keyname].SelectOptions[0];
                 }
             }
         })
+
+  
 
         this.state = {
             formData: NewData,
@@ -70,6 +86,8 @@ class FireWallDetailsForm extends React.Component{
             vlanIncrement: 0,
             pfIncremenet: 0,
         }
+
+        console.log(this.state.formData)
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -153,9 +171,28 @@ class FireWallDetailsForm extends React.Component{
         console.log(containerType)
 
         Object.keys(ContainerTypes[containerType]).map(function(keyname, keyindex){
+            console.log(ContainerTypes[containerType][keyname])
             if (ContainerTypes[containerType][keyname].Name){
                 if (ContainerTypes[containerType][keyname].InputType == "text"){
                     newSaved[containerID][keyname] = "";
+                }
+                else if (ContainerTypes[containerType][keyname].InputType == "checkbox"){
+                    newSaved[containerID][keyname] = true
+                }
+                else if (ContainerTypes[containerType][keyname].InputType == "checkboxGroup"){
+                    console.log(ContainerTypes[containerType][keyname].InputType)
+
+                    if (newSaved[containerID[keyname]] == undefined){
+                        console.log("not found")
+                        newSaved[containerID][keyname] = {}
+                    }
+                    
+                    const checkboxArray = ContainerTypes[containerType][keyname].checkboxArray
+
+                    checkboxArray.forEach(element => {
+                        console.log(element)
+                        newSaved[containerID][keyname][element] = false
+                    });
                 }
                 else if (ContainerTypes[containerType][keyname].InputType == "select"){
                     newSaved[containerID][keyname] = ContainerTypes[containerType][keyname].SelectOptions[0];
@@ -250,8 +287,19 @@ class FireWallDetailsForm extends React.Component{
         var NewData = FormData
 
         if (target.type == "checkbox"){
-            NewData[gggParent.id][target.id] = target.checked
+            //check whether it's part of a group, or standalone
+            const parent = target.parentElement.parentElement //get the div, they're all inside of labels
+            if (parent.classList[0] =="checkboxGroup"){
+                NewData[gggParent.id][parent.id][target.id] = target.checked
+            }
+            else{
+                NewData[gggParent.id][target.id] = target.checked
+            }
+     
         }        
+        else if (target.type == "select"){
+
+        }
         else{
             NewData[gggParent.id][target.id] = target.value
         }
@@ -426,6 +474,7 @@ class FireWallDetailsForm extends React.Component{
                                         
                                         // for each object in the field, create an input
                                         Object.keys(ContainerTypes[item]).map(function(keyname, keyindex){
+                                          
                                             // if it's the name property, assign it to the header (with any relevant concatenation)
                                             if (!ContainerTypes[item][keyname].Name){
                                                 
@@ -464,12 +513,24 @@ class FireWallDetailsForm extends React.Component{
                                                         </CreateInput>
                                                     )
                                                 }
+                                                else if(ContainerTypes[item][keyname].InputType === "checkboxGroup"){
+                                                    //checks whether there's a value to import
+                                                    const otherID = ContainerTypes[item][keyname].ID;
+                                                    return(
+                                                        <CreateInput
+                                                        id = {ContainerTypes[item][keyname].ID}
+                                                        name = {itemName}
+                                                        type = {ContainerTypes[item][keyname].InputType}
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChangeEvent}
+                                                        checkboxArray = {ContainerTypes[item][keyname].checkboxArray}
+                                                        >
+                                                        </CreateInput>
+                                                    )
+                                                }
                                                 else{
                                                     //checks whether there's a value to import
                                                     const otherID = ContainerTypes[item][keyname].ID;
-                                                    console.log(otherID)
-                                                    console.log(ContainerTypes[item][keyname])
-                                                    console.log(ContainerTypes[item][keyname].InputType)
 
                                                     return(
                                                         <CreateInput
