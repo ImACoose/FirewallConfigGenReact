@@ -42,6 +42,7 @@ class FireWallDetailsForm extends React.Component{
 
         var NewData = {}
         NewData["FirewallDefaults"] = {}
+        NewData["NativeVLANInformation"] = {}
 
         Object.keys(ContainerTypes.FirewallDefaults).map(function(keyname, keyindex){
             if (ContainerTypes.FirewallDefaults[keyname].Name){
@@ -67,6 +68,32 @@ class FireWallDetailsForm extends React.Component{
                 }
             }
         })
+
+        Object.keys(ContainerTypes.NativeVLANInformation).map(function(keyname, keyindex){
+            if (ContainerTypes.NativeVLANInformation[keyname].Name){
+                if (ContainerTypes.NativeVLANInformation[keyname].InputType == "text"){
+                    NewData["NativeVLANInformation"][keyname] = "";
+                }
+                else if (ContainerTypes.NativeVLANInformation[keyname].InputType == "checkbox"){
+                    NewData["NativeVLANInformation"][keyname]= true
+                }
+                else if (ContainerTypes.NativeVLANInformation[keyname].InputType == "checkboxGroup"){
+                    NewData["NativeVLANInformation"][keyname]= {}
+                    console.log(ContainerTypes.NativeVLANInformation[keyname].InputType)
+                    
+                    const checkboxArray = ContainerTypes.NativeVLANInformation[keyname].checkboxArray
+
+                    checkboxArray.forEach(element => {
+                        console.log(element)
+                        NewData["NativeVLANInformation"][keyname][element] = false
+                    });
+                }
+                else if (ContainerTypes.NativeVLANInformation[keyname].InputType == "select"){
+                    NewData["NativeVLANInformation"][keyname] = ContainerTypes.NativeVLANInformation[keyname].SelectOptions[0];
+                }
+            }
+        })
+
 
   
 
@@ -180,12 +207,8 @@ class FireWallDetailsForm extends React.Component{
                 }
                 else if (ContainerTypes[containerType][keyname].InputType == "checkboxGroup"){
                     console.log(ContainerTypes[containerType][keyname].InputType)
-
-                    if (newSaved[containerID[keyname]] == undefined){
-                        console.log("not found")
-                        newSaved[containerID][keyname] = {}
-                    }
-                    
+                    newSaved[containerID[keyname]] = {}
+                 
                     const checkboxArray = ContainerTypes[containerType][keyname].checkboxArray
 
                     checkboxArray.forEach(element => {
@@ -289,7 +312,7 @@ class FireWallDetailsForm extends React.Component{
             //check whether it's part of a group, or standalone
             const parent = target.parentElement.parentElement //get the div, they're all inside of labels
             if (parent.classList[0] =="checkboxGroup"){
-                NewData[gggParent.id][parent.id][target.id] = target.checked
+                NewData[gggParent.parentElement.id][parent.id][target.id] = target.checked
             }
             else{
                 NewData[gggParent.id][target.id] = target.checked
@@ -492,7 +515,7 @@ class FireWallDetailsForm extends React.Component{
                                             else{
                                                 // sort out the naming scheme here, used for indexing on the back end, so very important
                                                 var itemName = "";
-                                                if (containerName !== "System Settings"){
+                                                if (containerName !== "System Settings" && containerName !== "Native VLAN Information"){
                                                     itemName = ContainerTypes[item][keyname].Name + " " + Numbers[0]
                                                 }
                                                 else{

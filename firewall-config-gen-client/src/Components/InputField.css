@@ -14,6 +14,11 @@ select {
     height: 10
 }
 
+.checkboxGroup {
+    display: grid;
+    grid-template-columns: repeat(5, auto);
+}
+
 .hide {
     display:none;
 }
