@@ -138,48 +138,51 @@ class FireWallDetailsForm extends React.Component{
     }
 
     validateElement(element){
-        
-        // first, find the validation type of that element
-        // to do this, we need to find the Container
-        // with how things are set out, needs to be the grandparent (element stored in label, stored in div, stored in container)
-        const Container = element.parentElement.parentElement.parentElement
-        const ContainerName = Container.id.replace(/\d+/g, '');
-
-
-        const validationType = ContainerTypes[ContainerName][element.id].Validation
         var match = true
-        const regexUsed = regex[validationType]
-        const label = element.parentElement;
+        // ensure the element is not a checkbox or select
+        if (!element.type === "select" && !element.type == "checbox"){
+            // first, find the validation type of that element
+            // to do this, we need to find the Container
+            // with how things are set out, needs to be the grandparent (element stored in label, stored in div, stored in container)
+            const Container = element.parentElement.parentElement.parentElement
+            const ContainerName = Container.id.replace(/\d+/g, '');
+
+
+            const validationType = ContainerTypes[ContainerName][element.id].Validation
         
-        const spanElement = label.getElementsByTagName('span')[0]
-        if (regexUsed){
-            if (!regexUsed.test(element.value)){
-                match = false
+            const regexUsed = regex[validationType]
+            const label = element.parentElement;
+            
+            const spanElement = label.getElementsByTagName('span')[0]
+            if (regexUsed){
+                if (!regexUsed.test(element.value)){
+                    match = false
+                }
             }
-        }
-        else if (validationType == "vlanId"){
-            match = this.validateRange(element, 2, 4095)
-        }
-        else if (validationType == "portNo"){
-            match = this.validateRange(element, 1, 65353)
-        }
-        else if (validationType == "bps"){
-            match = this.validateRange(element, 1000, 1000000)
-            console.log(match)
-        }
+            else if (validationType == "vlanId"){
+                match = this.validateRange(element, 2, 4095)
+            }
+            else if (validationType == "portNo"){
+                match = this.validateRange(element, 1, 65353)
+            }
+            else if (validationType == "bps"){
+                match = this.validateRange(element, 1000, 1000000)
+                console.log(match)
+            }
 
-        if (match == false){
-            element.classList.add('error');
+            if (match == false){
+                element.classList.add('error');
 
-            spanElement.classList.remove('hide')
-            spanElement.innerHTML = errMsgs[validationType]
+                spanElement.classList.remove('hide')
+                spanElement.innerHTML = errMsgs[validationType]
+            }
+            else{
+                element.classList.remove('error')
+                spanElement.classList.add('hide')
+            }
+            console.log(element.classList)
         }
-        else{
-            element.classList.remove('error')
-            spanElement.classList.add('hide')
-        }
-        console.log(element.classList)
-        return match;
+       return match;
     }
 
 
