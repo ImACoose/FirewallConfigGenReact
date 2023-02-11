@@ -16,17 +16,21 @@ const errMsgs = {
     text: "Must contain only alphanumeric characters, -, _ and be between " + minimum + " - " + maximum + " characters long with no spaces",
     vlanId: "Must be between or equal to 2 and 4095",
     portNo: "Must be between or equal to 1 and 65353",
-    password: "Must be between 4 - 15 characters",
+    password: "Must be between 4 - 32 characters",
     suffix: "Must be a valid address",
-    bps: "Must be between or equal to 1000 and 1000000"
+    bps: "Must be between or equal to 1000 and 1000000",
+    email: "Must be a valid email in the format of example@example.com",
+    streetaddress: "Must be a valid street address",
 }
 
 const regex = {
     ipv4: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
     text: /^[a-zA-Z0-9_-]{4,15}$/,
-    password: /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{4,15}$/g,
+    password: /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{4,32}$/g,
     //vlanId: /^[2-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-4][0][0-9][0-4]$/,
     suffix: /\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b/g,
+    email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+    streetaddress: /^[a-zA-Z0-9, _-]{1,128}$/,
 }
 
 const IncrementMapping = {

@@ -70,7 +70,7 @@ const ContainerTypes = {
             InputType: "text",
             Name: "Street Address",
             Required: true,
-            Validation: "text",
+            Validation: "streetaddress",
         },
 
         //required, but any characters allowed, 1-20
@@ -79,7 +79,7 @@ const ContainerTypes = {
             InputType: "text",
             Name: "SNMP Community",
             Required: true,
-            Validation: "text",
+            Validation: "password",
         },
         
         WANConnectionType: {

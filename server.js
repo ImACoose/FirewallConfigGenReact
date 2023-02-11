@@ -21,6 +21,25 @@ const timezone_map = {
   AEST: 65
 };
 
+function cidrToSubnetMask(cidr) {
+  var mask = "";
+  var parts = cidr.split("/");
+  var subnet = parts[0];
+  var prefix = parseInt(parts[1]);
+  
+  for (var i = 0; i < 4; i++) {
+    if (prefix >= 8) {
+      mask += "255.";
+      prefix -= 8;
+    } else {
+      mask += (256 - (1 << 8 - prefix)).toString() + ".";
+      prefix = 0;
+    }
+  }
+  
+  return mask.substring(0, mask.length - 1);
+}
+
 function generateConfig(configFormJSON) {
     var hostname = configFormJSON.FirewallDefaults["HostName"];
     var adminUsername = configFormJSON.FirewallDefaults["AdminUsername"];
@@ -34,7 +53,10 @@ function generateConfig(configFormJSON) {
     var WANUploadKbps = configFormJSON.FirewallDefaults["WANUploadKBPS"];
     var WANDownloadKbps = configFormJSON.FirewallDefaults["WANDownloadKBPS"];
     var forticloudAccEmail = configFormJSON.FirewallDefaults["ForticloudAccEmail"];
-    var timezone = configFormJSON.FirewallDefaults["Timezone"]
+    var timezone = configFormJSON.FirewallDefaults["Timezone"];
+    var native_ipv4_address = configFormJSON.NativeVLANInformation["IPv4Address"];
+    var native_ipv4_mask = cidrToSubnetMask(`0.0.0.0${configFormJSON.NativeVLANInformation.CIDR}`);
+    var zones = {};
     var vlans = {};
 
     console.log(configFormJSON)
@@ -44,22 +66,42 @@ function generateConfig(configFormJSON) {
 
       if (configIndexSplit[0] === "") {
         vlans[configIndex] = {
-          vlanID: configFormJSON[configIndex].VLANID
+          vlan_id: configFormJSON[configIndex].VLANID,
+          ipv4_address: configFormJSON[configIndex].IPv4Address,
+          ipv4_mask: cidrToSubnetMask(`0.0.0.0${configFormJSON[configIndex].CIDR}`),
+          dhcpv4_enabled: configFormJSON[configIndex].DHCPv4Enabled,
         };
+
+        if (zones[configFormJSON[configIndex].Zone]) {
+          zones[configFormJSON[configIndex].Zone] = zones[configFormJSON[configIndex].Zone] + ` "VLAN${configFormJSON[configIndex].VLANID}"`;
+        } else {
+          zones[configFormJSON[configIndex].Zone] = `"VLAN${configFormJSON[configIndex].VLANID}"`;
+        }
       };
     };
 
+    if (zones[configFormJSON.NativeVLANInformation.Zone]) {
+      zones[configFormJSON.NativeVLANInformation.Zone] = zones[configFormJSON.NativeVLANInformation.Zone] + ` "lan"`;
+    } else {
+      zones[configFormJSON.NativeVLANInformation.Zone] + ` "lan"`;
+    }
+
     timezone = timezone_map[timezone];
-    
+
+    console.log(zones)
+
     var success = true;
 
-    const template = templateEngine.render("40F.fgt", {
+    const template = templateEngine.render(`${model}.fgt`, {
       hostname: hostname,
       vlans: vlans,
       timezone: timezone,
       admin_username: adminUsername,
       upload_kbps: WANUploadKbps,
-      download_kbps: WANDownloadKbps
+      download_kbps: WANDownloadKbps,
+      native_ipv4_address: native_ipv4_address,
+      native_ipv4_mask: native_ipv4_mask,
+      zones: zones
     });
 
     fs.writeFile(`./output/${hostname}.fgt`, template, function(err) {
