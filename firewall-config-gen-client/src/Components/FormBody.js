@@ -80,7 +80,7 @@ class FireWallDetailsForm extends React.Component{
                     NewData["NativeVLANInformation"][keyname] = "";
                 }
                 else if (ContainerTypes.NativeVLANInformation[keyname].InputType == "checkbox"){
-                    NewData["NativeVLANInformation"][keyname]= true
+                    NewData["NativeVLANInformation"][keyname]= false
                 }
                 else if (ContainerTypes.NativeVLANInformation[keyname].InputType == "checkboxGroup"){
                     NewData["NativeVLANInformation"][keyname]= {}
@@ -138,9 +138,12 @@ class FireWallDetailsForm extends React.Component{
     }
 
     validateElement(element){
+        console.log(element)
         var match = true
-        // ensure the element is not a checkbox or select
-        if (!element.type === "select" && !element.type == "checkbox"){
+        // ensure the element is not a checkbox or select, and not hidden
+        console.log(element.classList[0])
+        if (element.type !== "select" && element.type !== "checkbox" && element.classList[0] !== "hide"){
+            console.log(element)
             // first, find the validation type of that element
             // to do this, we need to find the Container
             // with how things are set out, needs to be the grandparent (element stored in label, stored in div, stored in container)
@@ -211,7 +214,7 @@ class FireWallDetailsForm extends React.Component{
                     newSaved[containerID][keyname] = "";
                 }
                 else if (ContainerTypes[containerType][keyname].InputType == "checkbox"){
-                    newSaved[containerID][keyname] = true
+                    newSaved[containerID][keyname] = false
                 }
                 else if (ContainerTypes[containerType][keyname].InputType == "checkboxGroup"){
                     console.log(ContainerTypes[containerType][keyname].InputType)
@@ -304,6 +307,44 @@ class FireWallDetailsForm extends React.Component{
         return ableToSubmit
     }
 
+    ToggleDHCPVLAN = (element, container) => {
+        const inputs = container.getElementsByTagName("input")
+        var NewData = this.state.formData
+            
+        if (element.checked == true){
+           
+            for (let i = 0; i < inputs.length; i++){
+                if (inputs[i].id == "DHCPv4StartAddress" || inputs[i].id == "DHCPv4EndAddress"){
+                    inputs[i].classList.remove("hide")
+                    inputs[i].parentElement.parentElement.classList.remove("hide")
+                }
+                else if (inputs[i].id == "IPHelperAddress"){
+                    inputs[i].classList.add("hide")
+                    inputs[i].parentElement.parentElement.classList.add("hide")
+                    NewData[container.id][inputs[i].id] = "";
+                }
+            }
+        }
+        else{
+            for (let i = 0; i < inputs.length; i++){
+                if (inputs[i].id == "DHCPv4StartAddress" || inputs[i].id == "DHCPv4EndAddress"){
+                    inputs[i].classList.add("hide")
+                    inputs[i].parentElement.parentElement.classList.add("hide")
+                    inputs[i].classList.remove("error")
+                    NewData[container.id][inputs[i].id] = "";
+                }
+                else if (inputs[i].id == "IPHelperAddress"){
+                    inputs[i].classList.remove("hide")
+                    inputs[i].parentElement.parentElement.classList.remove("hide")
+                }
+            }
+        }
+
+        this.setState({
+            formData: NewData,
+        })
+    }
+
     // so far, elements are only saved through onBlurring 
     // need to save them upon validation and hitting submit
     handleChange = (event) => {
@@ -320,6 +361,9 @@ class FireWallDetailsForm extends React.Component{
                 NewData[gggParent.parentElement.id][parent.id][target.id] = target.checked
             }
             else{
+                if (target.id == "DHCPv4Enabled"){
+                    this.ToggleDHCPVLAN(target, gggParent)
+                }
                 NewData[gggParent.id][target.id] = target.checked
             }
      
@@ -468,9 +512,11 @@ class FireWallDetailsForm extends React.Component{
                 const keyvalues = HeaderAndValues[1].split(',');
 
                 for (let j = 0; j < keyvalues.length; j++){
+                 
                     const IDandValue = keyvalues[j].split(':');
                     const ID = IDandValue[0].replace('{', '')
                     const val = IDandValue[1].replace('}', '')
+                    console.log(ID, val)
                     
                     // check whether there's a checkbox group, saved in group:[1-true_2-false] format
                     if (val.split('_').length > 1){
@@ -486,6 +532,7 @@ class FireWallDetailsForm extends React.Component{
                     }
                     else{
                         if (val == "true" || val == "false"){
+                            console.log(val)
                             containers[containerName][ID] = val == "true"
                         }
                         else{

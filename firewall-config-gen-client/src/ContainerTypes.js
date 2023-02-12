@@ -165,7 +165,7 @@ const ContainerTypes = {
 
         DHCPv4Enabled: {
             ID: "DHCPv4Enabled",
-            InputType: "Checkbox",
+            InputType: "checkbox",
             Name: "DHCPv4 Enabled",
         },
 
@@ -181,6 +181,14 @@ const ContainerTypes = {
             ID: "DHCPv4EndAddress",
             InputType: "text",
             Name: "DHCPv4 End Address",
+            Validation: "ipv4",
+        },
+
+        // displayed when DHCPv4 isn't enabled
+        IPHelperAddress: {
+            ID: "IPHelperAddress",
+            InputType: "text",
+            Name: "IPv4 Helper Address",
             Validation: "ipv4",
         },
 
@@ -217,7 +225,7 @@ const ContainerTypes = {
 
         DHCPv4Enabled: {
             ID: "DHCPv4Enabled",
-            InputType: "Checkbox",
+            InputType: "checkbox",
             Name: "DHCPv4 Enabled",
         },
 
@@ -233,6 +241,14 @@ const ContainerTypes = {
             ID: "DHCPv4EndAddress",
             InputType: "text",
             Name: "DHCPv4 End Address",
+            Validation: "ipv4",
+        },
+
+        // displayed when DHCPv4 isn't enabled
+        IPHelperAddress: {
+            ID: "IPHelperAddress",
+            InputType: "text",
+            Name: "IPv4 Helper Address",
             Validation: "ipv4",
         },
 
