@@ -23,9 +23,10 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
         )
     }
     else if (type=="checkbox"){
+        console.log(importe)
         return (
             <div>
-                <label> {name}<input id = {id} type = "checkbox" onChange={onChange}/></label>
+                <label> {name}<input id = {id} type = "checkbox" onChange={onChange} checked={importedValue}/></label>
             </div>
         )
     }
