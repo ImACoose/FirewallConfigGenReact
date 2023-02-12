@@ -48,6 +48,7 @@ function cidrToSubnetMask(cidr) {
 function generateConfig(configFormJSON) {
     var hostname = configFormJSON.FirewallDefaults["HostName"];
     var adminUsername = configFormJSON.FirewallDefaults["AdminUsername"];
+    var adminPassword = configFormJSON.FirewallDefaults["AdminPassword"];
     var dnsSuffix = configFormJSON.FirewallDefaults["DNSSuffix"];
     var primaryIPv4DNS = configFormJSON.FirewallDefaults["PrimaryIPv4DNS"];
     var secondaryIPv4DNS = configFormJSON.FirewallDefaults["SecondaryIpv4DNS"];
@@ -67,6 +68,7 @@ function generateConfig(configFormJSON) {
     var lan_interface = interface_map[model];
     var zones = {};
     var vlans = {};
+    var trusted_interfaces = {};
     var dhcpPools = {};
 
     console.log(configFormJSON)
@@ -125,12 +127,16 @@ function generateConfig(configFormJSON) {
       vlans: vlans,
       timezone: timezone,
       admin_username: adminUsername,
+      admin_password: adminPassword,
       upload_kbps: WANUploadKbps,
       download_kbps: WANDownloadKbps,
       native_ipv4_address: native_ipv4_address,
       native_ipv4_mask: native_ipv4_mask,
       zones: zones,
-      dhcp_pools: dhcpPools
+      dhcp_pools: dhcpPools,
+      forticloud_email: forticloudAccEmail,
+      primary_ipv4_dns: primaryIPv4DNS,
+      secondary_ipv4_dns: secondaryIPv4DNS
     });
 
     fs.writeFile(`./output/${hostname}.fgt`, template, function(err) {
