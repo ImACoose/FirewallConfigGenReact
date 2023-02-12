@@ -21,6 +21,11 @@ const timezone_map = {
   AEST: 65
 };
 
+const interface_map = {
+  "40F": "lan",
+  "80F": "internal"
+};
+
 function cidrToSubnetMask(cidr) {
   var mask = "";
   var parts = cidr.split("/");
@@ -56,8 +61,13 @@ function generateConfig(configFormJSON) {
     var timezone = configFormJSON.FirewallDefaults["Timezone"];
     var native_ipv4_address = configFormJSON.NativeVLANInformation["IPv4Address"];
     var native_ipv4_mask = cidrToSubnetMask(`0.0.0.0${configFormJSON.NativeVLANInformation.CIDR}`);
+    var native_dhcpv4_enabled = configFormJSON.NativeVLANInformation["DHCPv4Enabled"];
+    var native_dhcpv4_start_address = configFormJSON.NativeVLANInformation["DHCPv4StartAddress"];
+    var native_dhcpv4_end_address = configFormJSON.NativeVLANInformation["DHCPv4EndAddress"];
+    var lan_interface = interface_map[model];
     var zones = {};
     var vlans = {};
+    var dhcpPools = {};
 
     console.log(configFormJSON)
 
@@ -76,15 +86,33 @@ function generateConfig(configFormJSON) {
           zones[configFormJSON[configIndex].Zone] = zones[configFormJSON[configIndex].Zone] + ` "VLAN${configFormJSON[configIndex].VLANID}"`;
         } else {
           zones[configFormJSON[configIndex].Zone] = `"VLAN${configFormJSON[configIndex].VLANID}"`;
-        }
+        };
+
+        if (configFormJSON[configIndex].DHCPv4Enabled) {
+          dhcpPools[`VLAN${configFormJSON[configIndex].VLANID}`] = {
+            dhcpv4_start_address: configFormJSON[configIndex].DHCPv4StartAddress,
+            dhcpv4_end_address: configFormJSON[configIndex].DHCPv4EndAddress,
+            gw_address: configFormJSON[configIndex].IPv4Address,
+            mask: cidrToSubnetMask(`0.0.0.0${configFormJSON[configIndex].CIDR}`)
+          };
+        };
       };
     };
 
     if (zones[configFormJSON.NativeVLANInformation.Zone]) {
-      zones[configFormJSON.NativeVLANInformation.Zone] = zones[configFormJSON.NativeVLANInformation.Zone] + ` "lan"`;
+      zones[configFormJSON.NativeVLANInformation.Zone] = zones[configFormJSON.NativeVLANInformation.Zone] + ` "${lan_interface}"`;
     } else {
-      zones[configFormJSON.NativeVLANInformation.Zone] + ` "lan"`;
+      zones[configFormJSON.NativeVLANInformation.Zone] + ` "${lan_interface}"`;
     }
+
+    if (native_dhcpv4_enabled) {
+      dhcpPools[lan_interface] = {
+        dhcpv4_start_address: native_dhcpv4_start_address,
+        dhcpv4_end_address: native_dhcpv4_end_address,
+        gw_address: native_ipv4_address,
+        mask: native_ipv4_address
+      };
+    };
 
     timezone = timezone_map[timezone];
 
@@ -101,7 +129,8 @@ function generateConfig(configFormJSON) {
       download_kbps: WANDownloadKbps,
       native_ipv4_address: native_ipv4_address,
       native_ipv4_mask: native_ipv4_mask,
-      zones: zones
+      zones: zones,
+      dhcp_pools: dhcpPools
     });
 
     fs.writeFile(`./output/${hostname}.fgt`, template, function(err) {

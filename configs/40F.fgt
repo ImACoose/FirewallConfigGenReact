@@ -55,7 +55,7 @@ config system interface
         set mtu-override disable
         set status up
     next
-    {% for name, vlan in vlans -%}
+    {%- for name, vlan in vlans -%}
     edit "VLAN{{ vlan.vlan_id }}"
         set vdom "root"
         set mode static
@@ -77,10 +77,31 @@ config system zone
         set intrazone deny
         set interface "wan"
     next
-    {% for zone_name, interfaces in zones -%}
+    {%- for zone_name, interfaces in zones %}
     edit "z-{{ zone_name }}"
         set intrazone deny
         set interface {{ interfaces|safe }}
+    next
+    {%- endfor %}
+end
+config system dhcp server
+    {%- for interface, pool in dhcp_pools %}
+    delete {{ loop.index }}
+    edit {{ loop.index }}
+        set status enable
+        set lease-time 28800
+        set dns-service local
+        set default-gateway {{ pool.gw_address }}
+        set netmask {{ pool.mask }}
+        set interface "{{ interface }}"
+        config ip-range
+            edit 1
+                set start-ip {{ pool.dhcpv4_start_address }}
+                set end-ip {{ pool.dhcpv4_end_address }}
+            next
+        end
+        set server-type regular
+        set conflicted-ip-timeout 1800
     next
     {%- endfor %}
 end
