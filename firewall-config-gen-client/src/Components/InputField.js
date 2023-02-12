@@ -1,6 +1,6 @@
 import './InputField.css'
 
-function CreateInputField ({id, name, type, onBlur, onChange, importedValue, SelectOptions, checkboxArray}) {
+function CreateInputField ({id, name, addClass, type, onBlur, onChange, importedValue, SelectOptions, checkboxArray}) {
 
     if (type == "select"){
         return (
@@ -53,9 +53,11 @@ function CreateInputField ({id, name, type, onBlur, onChange, importedValue, Sel
     }
     else{
         console.log("The imported value is" + importedValue)
+        console.log(addClass)
+        console.log("the classname is " + addClass)
         return (
-            <div className=''>
-                <label> {name}: <input id={id} name={name} value={importedValue} type={type} onBlur={onBlur} onChange={onChange}></input> <span className='hide err'> Err Msg </span> </label>
+            <div className={addClass}>
+                <label> {name}: <input id={id}  name={name} value={importedValue} type={type} onBlur={onBlur} onChange={onChange} className={addClass}></input> <span className='hide err'> Err Msg </span> </label>
             </div>
         )
     }

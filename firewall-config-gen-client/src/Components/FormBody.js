@@ -652,11 +652,27 @@ class FireWallDetailsForm extends React.Component{
                                                 else{
                                                     //checks whether there's a value to import
                                                     const otherID = ContainerTypes[item][keyname].ID;
+                                                    var className = ""
+                                                    // need to add classList field 
+                                                    // need to initiliase the special hidden fields
+                                                    if (otherID == "DHCPv4StartAddress" || otherID == "DHCPv4EndAddress"){
+                                                        console.log("The edhcpovajdfasdfdsa denable falsdkjfasdfsadf")
+                                                        console.log(formData[ID].DHCPv4Enabled)
+                                                        if (formData[ID].DHCPv4Enabled != true){
+                                                            className = "hide"
+                                                        }
+                                                    }  
+                                                    else if(otherID == "IPHelperAddress"){
+                                                        if (formData[ID].DHCPv4Enabled == true){
+                                                            className = "hide"
+                                                        }
+                                                    } 
 
                                                     return(
                                                         <CreateInput
                                                         id = {ContainerTypes[item][keyname].ID}
                                                         name = {itemName}
+                                                        addClass = {className}
                                                         type = {ContainerTypes[item][keyname].InputType}
                                                         onBlur={handleBlur}
                                                         onChange={handleChangeEvent}
