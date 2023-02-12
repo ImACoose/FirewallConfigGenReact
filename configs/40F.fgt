@@ -5,11 +5,22 @@ config system global
     set switch-controller enable
     set timezone {{ timezone }}
 end
-config webfilter profile
-    edit "default"
-        set feature-set flow
-        set log-all-url enable
+config system admin
+    edit "{{ admin_username }}"
+        set trusthost1 10.0.0.0 255.0.0.0
+        set trusthost2 172.16.0.0 255.240.0.0
+        set trusthost3 192.168.0.0 255.255.0.0
+        set accprofile "super_admin"
+        set vdom "root"
+        set email-to "{{ forticloud_email }}"
+        set gui-default-dashboard-template "minimal"
+        set password "{{ admin_password }}"
     next
+end
+config system dns
+    set primary {{ primary_ipv4_dns }}
+    set secondary {{ secondary_ipv4_dns }}
+    set protocol cleartext
 end
 config firewall shaping-profile
     edit "default-out"
@@ -72,6 +83,16 @@ config system interface
     next
     {%- endfor %}
 end
+config router static
+    edit 1
+        set dst 0.0.0.0 0.0.0.0
+        set distance 10
+        set priority 1
+        set device "wan"
+        set dynamic-gateway enable
+        set status enable
+    next
+end
 config system zone
     edit "z-wan"
         set intrazone deny
@@ -104,4 +125,10 @@ config system dhcp server
         set conflicted-ip-timeout 1800
     next
     {%- endfor %}
+end
+config system snmp sysinfo
+    set status enable
+    set description "{{ hostname }} {{ model }}"
+    set contact-info "{{ forticloud_email }}"
+    set location "{{ street_address }}"
 end
