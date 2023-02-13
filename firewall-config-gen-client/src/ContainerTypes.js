@@ -395,7 +395,7 @@ const ContainerTypes = {
             ID: "DH2Group",
             InputType: "checkboxGroup",
             Name: "Select DH Group",
-            checkboxArray: ["1","2","5","14","15","16","17","18","19","20","21","27", "28","29","30","31","32"],
+            checkboxArray: ["1","2","5","14","15","16","17","18","19","20","21","27","28","29","30","31","32"],
         },
 
         Key2Lifetime: {

@@ -1,10 +1,10 @@
 .sidebar {
     background-color: rgb(253, 250, 255);
-    height: 150px;
+    height: 200px;
     width: 50px;
     display: grid;
     grid-template-columns: repeat(1,auto);
-    border-radius: 5px;
+    border-radius: 50px;
     position: absolute;
     padding: 0%;
     justify-items: center;
@@ -19,10 +19,19 @@
     margin-left: 0%;
     margin-right: 0%;
     margin-bottom: 5%;
+    border: 1px;
     border-radius: 50px;
     display:flex;
     justify-content: center;
     align-self: center;
+    border-color: white;
+    padding: 5px;
+}
+
+.sidebar:hover{
+    border: 2px solid rgb(158, 116, 166);
+    box-shadow: 5px 5px 0 0 rgb(124, 92, 135);
+    border-width: 2px;
 }
 
 .sidebar button:hover {
@@ -33,6 +42,24 @@ img {
     display: block;
     border-radius: 50px;
     height: 100%;
-    width: 100;
+    width: 100%;
 
+}
+
+#import {
+    display: block;
+    background-image: url("../Images/importsign.png");
+    background-repeat: no-repeat;
+    background-size: 80%;
+    background-position: center;
+}
+
+#reader {
+    opacity: 0;
+    width:100%;
+    height:100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    display:inline;
+    z-index: 2;
 }

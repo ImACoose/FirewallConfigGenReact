@@ -117,8 +117,8 @@ class FireWallDetailsForm extends React.Component{
             vlanIncrement: 0,
             pfIncrement: 0,
             vpnIncrement: 0,
-            sidebarTop: 0,
-            sidebarLeft:0,
+            sidebarTop: 120,
+            sidebarLeft:279,
         }
 
         console.log(this.state.formData)
@@ -268,6 +268,8 @@ class FireWallDetailsForm extends React.Component{
             this.setState({
                 formData: newTable,
                 [increment]: newIncrement,
+                sidebarLeft: 279,
+                sidebarTop: 100,
             })
         }
     }
@@ -695,17 +697,22 @@ class FireWallDetailsForm extends React.Component{
                         }     
                     })
                 }
-                <Sidebar positionleft={this.state.sidebarLeft} positiontop = {this.state.sidebarTop}></Sidebar>
+                <Sidebar positionleft={this.state.sidebarLeft} positiontop = {this.state.sidebarTop}>
+
+                    <button type = "button" id = "import"> <input type = "file" id = "reader" onChange={this.ImportData}/></button>
+                    <button type = "button" onClick={this.ExportData}> <img src='/Images/exportsign.png'/> </button>
+                    <button type = "button" onClick={(()=> this.removeContainer())}><img src='/Images/delete.png'/> </button>
+                </Sidebar>
+
                 <button type ='button' onClick={()=> addContainer("VLANInformation")}> Add VLAN! </button>
                 {// need to declare type = button, otherwise it will act as a submit button
                 }
                 <button type ='button' onClick={()=> addContainer("PFInformation")}> Add PF! </button>
                 <button type ='button' onClick={()=> addContainer("VPNInformation")}> Add VPN! </button>
-                <button type ='button' onClick={()=> this.removeContainer()}> Remove me! </button>
-                <button type = 'button' onClick={this.ExportData}> Export! </button>
+
                 <CreateInput
-                type="reader"
-                onChange={this.ImportData}>
+                        type="reader"
+                        onChange={this.ImportData}>
                 </CreateInput>
         
                 <button type = 'submit'> Submit </button>
