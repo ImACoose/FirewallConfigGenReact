@@ -45,6 +45,24 @@ function cidrToSubnetMask(cidr) {
   return mask.substring(0, mask.length - 1);
 }
 
+function getNetworkAddress(ipAddress, subnetMask) {
+  const ip = ipAddress.split(".").map(function (num) {
+    return parseInt(num, 10);
+  });
+
+  const mask = subnetMask.split(".").map(function (num) {
+    return parseInt(num, 10);
+  });
+
+  const networkAddress = [];
+
+  for (let i = 0; i < 4; i++) {
+    networkAddress[i] = ip[i] & mask[i];
+  }
+
+  return networkAddress.join(".");
+}
+
 function generateConfig(configFormJSON) {
     var hostname = configFormJSON.FirewallDefaults["HostName"];
     var adminUsername = configFormJSON.FirewallDefaults["AdminUsername"];
@@ -65,7 +83,10 @@ function generateConfig(configFormJSON) {
     var native_dhcpv4_enabled = configFormJSON.NativeVLANInformation["DHCPv4Enabled"];
     var native_dhcpv4_start_address = configFormJSON.NativeVLANInformation["DHCPv4StartAddress"];
     var native_dhcpv4_end_address = configFormJSON.NativeVLANInformation["DHCPv4EndAddress"];
+    var native_ipv4_cidr = configFormJSON.NativeVLANInformation.CIDR
+    var native_vlan_zone = configFormJSON.NativeVLANInformation.Zone
     var lan_interface = interface_map[model];
+    var native_ipv4_network_address = getNetworkAddress(native_ipv4_address, native_ipv4_mask);
     var zones = {};
     var vlans = {};
     var trusted_interfaces = {};
@@ -82,6 +103,9 @@ function generateConfig(configFormJSON) {
           ipv4_address: configFormJSON[configIndex].IPv4Address,
           ipv4_mask: cidrToSubnetMask(`0.0.0.0${configFormJSON[configIndex].CIDR}`),
           dhcpv4_enabled: configFormJSON[configIndex].DHCPv4Enabled,
+          zone: configFormJSON[configIndex].Zone,
+          ipv4_cidr: configFormJSON[configIndex].CIDR,
+          ipv4_network_address: getNetworkAddress(configFormJSON[configIndex].IPv4Address, cidrToSubnetMask(`0.0.0.0${configFormJSON[configIndex].CIDR}`))
         };
 
         if (zones[configFormJSON[configIndex].Zone]) {
@@ -136,7 +160,10 @@ function generateConfig(configFormJSON) {
       dhcp_pools: dhcpPools,
       forticloud_email: forticloudAccEmail,
       primary_ipv4_dns: primaryIPv4DNS,
-      secondary_ipv4_dns: secondaryIPv4DNS
+      secondary_ipv4_dns: secondaryIPv4DNS,
+      native_ipv4_cidr: native_ipv4_cidr,
+      native_vlan_zone: native_vlan_zone,
+      native_ipv4_network_address: native_ipv4_network_address
     });
 
     fs.writeFile(`./output/${hostname}.fgt`, template, function(err) {

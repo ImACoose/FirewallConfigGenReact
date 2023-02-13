@@ -22,6 +22,48 @@ config system dns
     set secondary {{ secondary_ipv4_dns }}
     set protocol cleartext
 end
+config system snmp sysinfo
+    set status enable
+    set description "{{ hostname }} {{ model }}"
+    set contact-info "{{ forticloud_email }}"
+    set location "{{ street_address }}"
+end
+config system autoupdate schedule
+    set frequency daily
+    set time 03:60
+end
+config system central-management
+    set type fortiguard
+end
+config log fortiguard setting
+    set status enable
+    set upload-option realtime
+end
+config system fortiguard
+    set fortiguard-anycast disable
+    set protocol udp
+    set port 8888
+    set update-server-location automatic
+    set sdns-server-ip "208.91.112.220" "173.243.138.221"
+end
+config log memory setting
+    set status enable
+end
+config log null-device setting
+    set status disable
+end
+config log setting
+    set resolve-ip enable
+    set fwpolicy-implicit-log enable
+    set local-in-allow enable
+    set local-in-deny-unicast enable
+    set local-in-deny-broadcast enable
+    set local-out enable
+end
+config log memory filter
+    set severity information
+    set local-traffic enable
+end
 config firewall shaping-profile
     edit "default-out"
         set default-class-id 4
@@ -126,9 +168,17 @@ config system dhcp server
     next
     {%- endfor %}
 end
-config system snmp sysinfo
-    set status enable
-    set description "{{ hostname }} {{ model }}"
-    set contact-info "{{ forticloud_email }}"
-    set location "{{ street_address }}"
+config firewall address
+    edit "{{ native_ipv4_network_address }}{{ native_ipv4_cidr }}"
+        set type ipmask
+        set associated-interface "z-{{ native_vlan_zone }}"
+        set subnet {{ native_ipv4_network_address }} {{ native_ipv4_mask }}
+    next
+    {%- for name, vlan in vlans %}
+    edit "VLAN{{vlan.vlan_id}}_{{ vlan.ipv4_network_address }}{{ vlan.ipv4_cidr }}"
+        set type ipmask
+        set associated-interface "z-{{ vlan.zone }}"
+        set subnet {{ vlan.ipv4_network_address }} {{ vlan.ipv4_mask }}
+    next
+    {%- endfor %}
 end
