@@ -31,7 +31,7 @@ const errMsgs = {
 const regex = {
     ipv4: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
     text: /^[a-zA-Z0-9_-]{4,15}$/,
-    password: /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{4,32}$/g,
+    password: /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{4,32}$/g, //keeps coming up as true and false
     //vlanId: /^[2-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-4][0][0-9][0-4]$/,
     suffix: /\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b/g,
     email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
@@ -163,10 +163,15 @@ class FireWallDetailsForm extends React.Component{
         
             const regexUsed = regex[validationType]
             const label = element.parentElement;
+
+            console.log("checking regex")
+            console.log(regexUsed)
             
             const spanElement = label.getElementsByTagName('span')[0]
             if (regexUsed){
-                if (!regexUsed.test(element.value)){
+                const matches = regexUsed.test(element.value) //dunno why i need to do this first
+                if (matches == false){
+                    console.log("getting set to false in the regex test")
                     match = false
                 }
             }
@@ -181,9 +186,11 @@ class FireWallDetailsForm extends React.Component{
                 console.log(match)
             }
 
+            console.log("printing match")
+            console.log(match)
+
             if (match === false){
                 element.classList.add('error');
-
                 spanElement.classList.remove('hide')
                 spanElement.innerHTML = errMsgs[validationType]
             }
@@ -751,7 +758,7 @@ class FireWallDetailsForm extends React.Component{
                     <button type ='button' onClick={()=> addContainer("VLANInformation")}> Add VLAN! </button>
                     {// need to declare type = button, otherwise it will act as a submit button
                     }
-                    <button type ='button' onClick={()=> addContainer("PFInformation")}> Add PF! </button>
+                    <button type ='button' onClick={()=> addContainer("PFInformation")}> Add Port Forwarding! </button>
                     <button type ='button' onClick={()=> addContainer("VPNInformation")}> Add VPN! </button>
                 </SidebarOptions>
 

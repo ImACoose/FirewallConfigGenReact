@@ -121,28 +121,8 @@ const ContainerTypes = {
             SelectOptions: ["AEST", "ACST"],
             Required: true,
         },
-
-        checkBoxExample: {
-            ID: "checkBoxExample",
-            InputType: "checkbox",
-            Name: "Test check",
-        },
-
-        checkBoxGroup: {
-            ID: "checkBoxGroup",
-            InputType: "checkboxGroup",
-            Name: "Checkbox group",
-            checkboxArray: ["1","2","3","5","15","19","27","32"],
-        },
     } ,
 
-    FirewallOptions: {
-        Name: "Options",
-        newField: {
-            InputType: "password",
-            Name: "Very Admin",
-        },
-    },
 
     // need a permanent VLAN called 'native vlan', cannot be deleted!!
 
@@ -404,6 +384,10 @@ const ContainerTypes = {
             Name: "Key Lifetime (Seconds)",
             Validation: "text",
         },
+
+        FirewallPolicy: {
+
+        }
 
 
 
