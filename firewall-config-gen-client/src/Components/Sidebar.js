@@ -7,7 +7,6 @@ function Sidebar({positionleft, positiontop, children}){
         <div className='sidebar'
         style={{top:positiontop, left:actualLeft, transition: '0.3s'}}>
             {children}
-            <button type = "button"><img src='/Images/add.png'/> </button>
         </div>
     )
 }

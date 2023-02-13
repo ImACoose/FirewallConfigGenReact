@@ -1,0 +1,34 @@
+.SidebarOptions {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    display: grid;
+    grid-template-columns: repeat(1, auto);
+    justify-items: center; /* centers item in grid*/
+    margin:0px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    align-items: center;
+    visibility: hidden;
+}
+
+.SidebarOptions button {
+    padding: 0px;
+    color: rgb(139, 109, 174);
+    background-color: white;
+    border-radius: 20px;
+    width: 90%;
+    border: 1px white;
+    height: 90%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.SidebarOptions button:hover {
+    background-color: rgb(238, 223, 223);
+    cursor: pointer;
+    border: 1px solid rgb(158, 116, 166);
+    box-shadow: 5px 5px 0 0 rgb(124, 92, 135);
+    border-width: 2px;
+}

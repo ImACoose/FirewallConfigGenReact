@@ -4,14 +4,17 @@ import CreateContainer from './Container';
 import React from 'react';
 import ContainerTypes from '../ContainerTypes.js'
 import Sidebar from './Sidebar'
+import SidebarOptions from './SidebarOptions';
 
 // use multiple dots to go back further levels ./ for one, ../ for two
 
 const minimum = 4
 const maximum = 15
 const numberRegex = /\d+/g;
+const sidebarOptionsWidth = 150
 var lastHoveredElement;
 
+// error msgs for validation
 const errMsgs = {
     ipv4: "Must be a valid IP Address",
     text: "Must contain only alphanumeric characters, -, _ and be between " + minimum + " - " + maximum + " characters long with no spaces",
@@ -24,6 +27,7 @@ const errMsgs = {
     streetaddress: "Must be a valid street address",
 }
 
+// regex for validation
 const regex = {
     ipv4: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
     text: /^[a-zA-Z0-9_-]{4,15}$/,
@@ -34,6 +38,7 @@ const regex = {
     streetaddress: /^[a-zA-Z0-9, _-]{1,128}$/,
 }
 
+// used to count total number of optional fields added
 const IncrementMapping = {
     VLANInformation: "vlanIncrement",
     PFInformation: "pfIncrement",
@@ -50,15 +55,15 @@ class FireWallDetailsForm extends React.Component{
         NewData["FirewallDefaults"] = {}
         NewData["NativeVLANInformation"] = {}
 
-        Object.keys(ContainerTypes.FirewallDefaults).map(function(keyname, keyindex){
+        Object.keys(ContainerTypes.FirewallDefaults).forEach(function(keyname, keyindex){
             if (ContainerTypes.FirewallDefaults[keyname].Name){
-                if (ContainerTypes.FirewallDefaults[keyname].InputType == "text"){
+                if (ContainerTypes.FirewallDefaults[keyname].InputType === "text"){
                     NewData["FirewallDefaults"][keyname] = "";
                 }
-                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "checkbox"){
+                else if (ContainerTypes.FirewallDefaults[keyname].InputType === "checkbox"){
                     NewData["FirewallDefaults"][keyname]= true
                 }
-                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "checkboxGroup"){
+                else if (ContainerTypes.FirewallDefaults[keyname].InputType === "checkboxGroup"){
                     NewData["FirewallDefaults"][keyname]= {}
                     console.log(ContainerTypes.FirewallDefaults[keyname].InputType)
                     
@@ -69,32 +74,30 @@ class FireWallDetailsForm extends React.Component{
                         NewData["FirewallDefaults"][keyname][element] = false
                     });
                 }
-                else if (ContainerTypes.FirewallDefaults[keyname].InputType == "select"){
+                else if (ContainerTypes.FirewallDefaults[keyname].InputType === "select"){
                     NewData["FirewallDefaults"][keyname] = ContainerTypes.FirewallDefaults[keyname].SelectOptions[0];
                 }
             }
         })
 
-        Object.keys(ContainerTypes.NativeVLANInformation).map(function(keyname, keyindex){
+        Object.keys(ContainerTypes.NativeVLANInformation).forEach(function(keyname, keyindex){
             if (ContainerTypes.NativeVLANInformation[keyname].Name){
-                if (ContainerTypes.NativeVLANInformation[keyname].InputType == "text"){
+                if (ContainerTypes.NativeVLANInformation[keyname].InputType === "text"){
                     NewData["NativeVLANInformation"][keyname] = "";
                 }
-                else if (ContainerTypes.NativeVLANInformation[keyname].InputType == "checkbox"){
+                else if (ContainerTypes.NativeVLANInformation[keyname].InputType === "checkbox"){
                     NewData["NativeVLANInformation"][keyname]= false
                 }
-                else if (ContainerTypes.NativeVLANInformation[keyname].InputType == "checkboxGroup"){
+                else if (ContainerTypes.NativeVLANInformation[keyname].InputType === "checkboxGroup"){
                     NewData["NativeVLANInformation"][keyname]= {}
-                    console.log(ContainerTypes.NativeVLANInformation[keyname].InputType)
                     
                     const checkboxArray = ContainerTypes.NativeVLANInformation[keyname].checkboxArray
 
                     checkboxArray.forEach(element => {
-                        console.log(element)
                         NewData["NativeVLANInformation"][keyname][element] = false
                     });
                 }
-                else if (ContainerTypes.NativeVLANInformation[keyname].InputType == "select"){
+                else if (ContainerTypes.NativeVLANInformation[keyname].InputType === "select"){
                     NewData["NativeVLANInformation"][keyname] = ContainerTypes.NativeVLANInformation[keyname].SelectOptions[0];
                 }
             }
@@ -119,6 +122,8 @@ class FireWallDetailsForm extends React.Component{
             vpnIncrement: 0,
             sidebarTop: 120,
             sidebarLeft:279,
+            width: 0,
+            visibility: 'hidden',
         }
 
         console.log(this.state.formData)
@@ -165,18 +170,18 @@ class FireWallDetailsForm extends React.Component{
                     match = false
                 }
             }
-            else if (validationType == "vlanId"){
+            else if (validationType === "vlanId"){
                 match = this.validateRange(element, 2, 4095)
             }
-            else if (validationType == "portNo"){
+            else if (validationType === "portNo"){
                 match = this.validateRange(element, 1, 65353)
             }
-            else if (validationType == "bps"){
+            else if (validationType === "bps"){
                 match = this.validateRange(element, 1000, 1000000)
                 console.log(match)
             }
 
-            if (match == false){
+            if (match === false){
                 element.classList.add('error');
 
                 spanElement.classList.remove('hide')
@@ -197,6 +202,20 @@ class FireWallDetailsForm extends React.Component{
     // If it's found in the containers array, all the elements from that object
     // are loaded inside of a new container
 
+    DisplayOptions = (event) => {
+        this.setState({
+            width: sidebarOptionsWidth,
+            visibility: 'visible',
+        })
+    }
+
+    HideOptions = (event) =>{
+        this.setState({
+            width: 0,
+            visibility: 'hidden',
+        })
+    }
+
     addContainer(containerType){
         const oldSaved = this.state.formData
         var newSaved = oldSaved
@@ -210,16 +229,16 @@ class FireWallDetailsForm extends React.Component{
         console.log(containerID)
         console.log(containerType)
 
-        Object.keys(ContainerTypes[containerType]).map(function(keyname, keyindex){
+        Object.keys(ContainerTypes[containerType]).forEach(function(keyname, keyindex){
             console.log(ContainerTypes[containerType][keyname])
             if (ContainerTypes[containerType][keyname].Name){
-                if (ContainerTypes[containerType][keyname].InputType == "text"){
+                if (ContainerTypes[containerType][keyname].InputType === "text"){
                     newSaved[containerID][keyname] = "";
                 }
-                else if (ContainerTypes[containerType][keyname].InputType == "checkbox"){
+                else if (ContainerTypes[containerType][keyname].InputType === "checkbox"){
                     newSaved[containerID][keyname] = false
                 }
-                else if (ContainerTypes[containerType][keyname].InputType == "checkboxGroup"){
+                else if (ContainerTypes[containerType][keyname].InputType === "checkboxGroup"){
                     console.log(ContainerTypes[containerType][keyname].InputType)
                     newSaved[containerID][keyname] = {}
                  
@@ -230,7 +249,7 @@ class FireWallDetailsForm extends React.Component{
                         newSaved[containerID][keyname][element] = false
                     });
                 }
-                else if (ContainerTypes[containerType][keyname].InputType == "select"){
+                else if (ContainerTypes[containerType][keyname].InputType === "select"){
                     newSaved[containerID][keyname] = ContainerTypes[containerType][keyname].SelectOptions[0];
                 }
             }
@@ -246,7 +265,7 @@ class FireWallDetailsForm extends React.Component{
     }
 
     removeContainer(event){
-        if (lastHoveredElement.id != "FirewallDefaults"){
+        if (lastHoveredElement.id !== "FirewallDefaults"){
             // probably save the names in the table too
             // need to grab all the optionals
             const baseID = lastHoveredElement.id.replace(numberRegex, '')
@@ -258,7 +277,7 @@ class FireWallDetailsForm extends React.Component{
             const containerNumber = lastHoveredElement.id.match(numberRegex)
             var newIncrement = this.state[increment]
 
-            if (containerNumber == newIncrement){
+            if (containerNumber === newIncrement){
                 newIncrement = this.state[increment] -1
             }
 
@@ -276,26 +295,50 @@ class FireWallDetailsForm extends React.Component{
 
     updateHover(event){
         const container = event.target;
+
         const numberRegex = /\d+/g;
         const baseID = container.id.replace(numberRegex, '');
         const parentID = container.parentElement.id.replace(numberRegex, '')
         const gGGrandparentID = container.parentElement.parentElement.parentElement.id.replace(numberRegex, '')
 
-
-        if ( ContainerTypes[baseID]){
-            lastHoveredElement = container;
+        // if it's undefined, set it to the current hovered element. Else, check whether the current element is different to the lasthoveredelement
+        if (lastHoveredElement === undefined){
+            if ( ContainerTypes[baseID]){
+                lastHoveredElement = container;
+            }
+            else if (ContainerTypes[parentID]){
+                lastHoveredElement = container.parentElement;
+            }
+            else if (ContainerTypes[gGGrandparentID]){
+                lastHoveredElement = container.parentElement.parentElement.parentElement;
+            }
+    
+            this.setState({
+                sidebarLeft: lastHoveredElement.offsetLeft,
+                sidebarTop: lastHoveredElement.offsetTop,
+                width: 0,
+                visibility: 'hidden',
+            })
         }
-        else if (ContainerTypes[parentID]){
-            lastHoveredElement = container.parentElement;
+        else if (baseID !== lastHoveredElement.id && parentID !== lastHoveredElement.id && gGGrandparentID !== lastHoveredElement.id){
+            console.log("element udpated")
+            if ( ContainerTypes[baseID]){
+                lastHoveredElement = container;
+            }
+            else if (ContainerTypes[parentID]){
+                lastHoveredElement = container.parentElement;
+            }
+            else if (ContainerTypes[gGGrandparentID]){
+                lastHoveredElement = container.parentElement.parentElement.parentElement;
+            }
+    
+            this.setState({
+                sidebarLeft: lastHoveredElement.offsetLeft,
+                sidebarTop: lastHoveredElement.offsetTop,
+                width: 0,
+                visibility: 'hidden',
+            })
         }
-        else if (ContainerTypes[gGGrandparentID]){
-            lastHoveredElement = container.parentElement.parentElement.parentElement;
-        }
-
-        this.setState({
-            sidebarLeft: lastHoveredElement.offsetLeft,
-            sidebarTop: lastHoveredElement.offsetTop,
-        })
     }
 
     validateAll(){
@@ -305,9 +348,9 @@ class FireWallDetailsForm extends React.Component{
 
 
         for (var i = 0; i < inputElements.length; i++){
-            if (inputElements[i].id != "reader" && inputElements[i].type != "checkbox") {
+            if (inputElements[i].id !== "reader" && inputElements[i].type !== "checkbox") {
                 var match = this.validateElement(inputElements[i])
-                if (match == false){
+                if (match === false){
                     ableToSubmit = false
                 }
             }
@@ -321,14 +364,14 @@ class FireWallDetailsForm extends React.Component{
         const inputs = container.getElementsByTagName("input")
         var NewData = this.state.formData
             
-        if (element.checked == true){
+        if (element.checked === true){
            
             for (let i = 0; i < inputs.length; i++){
-                if (inputs[i].id == "DHCPv4StartAddress" || inputs[i].id == "DHCPv4EndAddress"){
+                if (inputs[i].id === "DHCPv4StartAddress" || inputs[i].id === "DHCPv4EndAddress"){
                     inputs[i].classList.remove("hide")
                     inputs[i].parentElement.parentElement.classList.remove("hide")
                 }
-                else if (inputs[i].id == "IPHelperAddress"){
+                else if (inputs[i].id === "IPHelperAddress"){
                     inputs[i].classList.add("hide")
                     inputs[i].parentElement.parentElement.classList.add("hide")
                     NewData[container.id][inputs[i].id] = "";
@@ -337,13 +380,13 @@ class FireWallDetailsForm extends React.Component{
         }
         else{
             for (let i = 0; i < inputs.length; i++){
-                if (inputs[i].id == "DHCPv4StartAddress" || inputs[i].id == "DHCPv4EndAddress"){
+                if (inputs[i].id === "DHCPv4StartAddress" || inputs[i].id === "DHCPv4EndAddress"){
                     inputs[i].classList.add("hide")
                     inputs[i].parentElement.parentElement.classList.add("hide")
                     inputs[i].classList.remove("error")
                     NewData[container.id][inputs[i].id] = "";
                 }
-                else if (inputs[i].id == "IPHelperAddress"){
+                else if (inputs[i].id === "IPHelperAddress"){
                     inputs[i].classList.remove("hide")
                     inputs[i].parentElement.parentElement.classList.remove("hide")
                 }
@@ -364,21 +407,21 @@ class FireWallDetailsForm extends React.Component{
         const gggParent = target.parentElement.parentElement.parentElement
         var NewData = FormData
 
-        if (target.type == "checkbox"){
+        if (target.type === "checkbox"){
             //check whether it's part of a group, or standalone
             const parent = target.parentElement.parentElement //get the div, they're all inside of labels
-            if (parent.classList[0] =="checkboxGroup"){
+            if (parent.classList[0] ==="checkboxGroup"){
                 NewData[gggParent.parentElement.id][parent.id][target.id] = target.checked
             }
             else{
-                if (target.id == "DHCPv4Enabled"){
+                if (target.id === "DHCPv4Enabled"){
                     this.ToggleDHCPVLAN(target, gggParent)
                 }
                 NewData[gggParent.id][target.id] = target.checked
             }
      
         }        
-        else if (target.type == "select"){
+        else if (target.type === "select"){
 
         }
         else{
@@ -409,7 +452,7 @@ class FireWallDetailsForm extends React.Component{
         var ableToSubmit = this.validateAll();
         ableToSubmit = true
 
-        if (ableToSubmit == true){
+        if (ableToSubmit === true){
             // send  a request to this specific URL
             fetch('http://localhost:3001/generate', {
                 method: 'POST',
@@ -468,7 +511,7 @@ class FireWallDetailsForm extends React.Component{
                         const checkboxVal = checkboxArray[k][1]
                         
                         newString = newString.concat(checkboxID, '-', checkboxVal)
-                        if (k + 1 == checkboxArray.length){
+                        if (k + 1 === checkboxArray.length){
                             newString = newString.concat("]")
                         }
                         else{
@@ -481,7 +524,7 @@ class FireWallDetailsForm extends React.Component{
                 }
 
                 // if it's at the end, close off the bracket, else, insert a comma
-                if (j + 1 == keyValues.length){
+                if (j + 1 === keyValues.length){
                     newString = newString.concat("}")
                 }
                 else{
@@ -490,7 +533,7 @@ class FireWallDetailsForm extends React.Component{
 
             }
 
-            if (i + 1 != entries.length){
+            if (i + 1 !== entries.length){
                 newString = newString.concat(";")
             }
         }
@@ -534,13 +577,13 @@ class FireWallDetailsForm extends React.Component{
                             const checkboxID = checkboxIDandValue[0].replace('[', '')
                             const checkboxValue = checkboxIDandValue[1].replace(']', '')
                             // saves the individual checkbox to the big checkbox array
-                            containers[containerName][ID][checkboxID] = checkboxValue == "true" // these get imported as strings, this converts to a bool
+                            containers[containerName][ID][checkboxID] = checkboxValue === "true" // these get imported as strings, this converts to a bool
                         }
                     }
                     else{
-                        if (val == "true" || val == "false"){
+                        if (val === "true" || val === "false"){
                             console.log(val)
-                            containers[containerName][ID] = val == "true"
+                            containers[containerName][ID] = val === "true"
                         }
                         else{
                             containers[containerName][ID] = val
@@ -662,13 +705,13 @@ class FireWallDetailsForm extends React.Component{
                                                     var className = ""
                                                     // need to add classList field 
                                                     // need to initiliase the special hidden fields
-                                                    if (otherID == "DHCPv4StartAddress" || otherID == "DHCPv4EndAddress"){
-                                                        if (formData[ID].DHCPv4Enabled != true){
+                                                    if (otherID === "DHCPv4StartAddress" || otherID === "DHCPv4EndAddress"){
+                                                        if (formData[ID].DHCPv4Enabled !== true){
                                                             className = "hide"
                                                         }
                                                     }  
-                                                    else if(otherID == "IPHelperAddress"){
-                                                        if (formData[ID].DHCPv4Enabled == true){
+                                                    else if(otherID === "IPHelperAddress"){
+                                                        if (formData[ID].DHCPv4Enabled === true){
                                                             className = "hide"
                                                         }
                                                     } 
@@ -698,18 +741,23 @@ class FireWallDetailsForm extends React.Component{
                     })
                 }
                 <Sidebar positionleft={this.state.sidebarLeft} positiontop = {this.state.sidebarTop}>
-
+                    <button type = "button" onClick={this.DisplayOptions}><img src='/Images/add.png' alt='Add field'/> </button>
                     <button type = "button" id = "import"> <input type = "file" id = "reader" onChange={this.ImportData}/></button>
-                    <button type = "button" onClick={this.ExportData}> <img src='/Images/exportsign.png'/> </button>
-                    <button type = "button" onClick={(()=> this.removeContainer())}><img src='/Images/delete.png'/> </button>
+                    <button type = "button" onClick={this.ExportData}> <img src='/Images/exportsign.png' alt='Export data'/> </button>
+                    <button type = "button" onClick={(()=> this.removeContainer())}><img src='/Images/delete.png' alt='delete field'/> </button>
                 </Sidebar>
 
-                <button type ='button' onClick={()=> addContainer("VLANInformation")}> Add VLAN! </button>
-                {// need to declare type = button, otherwise it will act as a submit button
-                }
-                <button type ='button' onClick={()=> addContainer("PFInformation")}> Add PF! </button>
-                <button type ='button' onClick={()=> addContainer("VPNInformation")}> Add VPN! </button>
+                <SidebarOptions positionLeft={this.state.sidebarLeft} positionTop = {this.state.sidebarTop} width = {this.state.width} visibility={this.state.visibility}>
+                    <button type ='button' onClick={()=> addContainer("VLANInformation")}> Add VLAN! </button>
+                    {// need to declare type = button, otherwise it will act as a submit button
+                    }
+                    <button type ='button' onClick={()=> addContainer("PFInformation")}> Add PF! </button>
+                    <button type ='button' onClick={()=> addContainer("VPNInformation")}> Add VPN! </button>
+                </SidebarOptions>
 
+            
+
+          
                 <CreateInput
                         type="reader"
                         onChange={this.ImportData}>
