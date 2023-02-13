@@ -3,6 +3,7 @@ import CreateInput from './InputField';
 import CreateContainer from './Container';
 import React from 'react';
 import ContainerTypes from '../ContainerTypes.js'
+import Sidebar from './Sidebar'
 
 // use multiple dots to go back further levels ./ for one, ../ for two
 
@@ -116,6 +117,8 @@ class FireWallDetailsForm extends React.Component{
             vlanIncrement: 0,
             pfIncrement: 0,
             vpnIncrement: 0,
+            sidebarTop: 0,
+            sidebarLeft:0,
         }
 
         console.log(this.state.formData)
@@ -286,6 +289,11 @@ class FireWallDetailsForm extends React.Component{
         else if (ContainerTypes[gGGrandparentID]){
             lastHoveredElement = container.parentElement.parentElement.parentElement;
         }
+
+        this.setState({
+            sidebarLeft: lastHoveredElement.offsetLeft,
+            sidebarTop: lastHoveredElement.offsetTop,
+        })
     }
 
     validateAll(){
@@ -432,7 +440,6 @@ class FireWallDetailsForm extends React.Component{
 
         // for each container in the form
         for (let i = 0; i < entries.length; i++){
-            console.log(entries[i])
             const container = entries[i]
             const containerName = container[0]
             const containerFields = container[1]
@@ -447,11 +454,9 @@ class FireWallDetailsForm extends React.Component{
             for (let j = 0; j < keyValues.length; j++){
                 const objID = keyValues[j][0]
                 const objValue = keyValues[j][1]
-                console.log(objID)
-                console.log(objValue)
 
                 if (typeof(objValue) === 'object'){
-                    console.log("found an object!")
+                    
                     newString = newString.concat(objID, ':[')
 
                     const checkboxArray = Object.entries(objValue)
@@ -656,8 +661,6 @@ class FireWallDetailsForm extends React.Component{
                                                     // need to add classList field 
                                                     // need to initiliase the special hidden fields
                                                     if (otherID == "DHCPv4StartAddress" || otherID == "DHCPv4EndAddress"){
-                                                        console.log("The edhcpovajdfasdfdsa denable falsdkjfasdfsadf")
-                                                        console.log(formData[ID].DHCPv4Enabled)
                                                         if (formData[ID].DHCPv4Enabled != true){
                                                             className = "hide"
                                                         }
@@ -692,6 +695,7 @@ class FireWallDetailsForm extends React.Component{
                         }     
                     })
                 }
+                <Sidebar positionleft={this.state.sidebarLeft} positiontop = {this.state.sidebarTop}></Sidebar>
                 <button type ='button' onClick={()=> addContainer("VLANInformation")}> Add VLAN! </button>
                 {// need to declare type = button, otherwise it will act as a submit button
                 }

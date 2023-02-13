@@ -52,9 +52,6 @@ function CreateInputField ({id, name, addClass, type, onBlur, onChange, imported
         )
     }
     else{
-        console.log("The imported value is" + importedValue)
-        console.log(addClass)
-        console.log("the classname is " + addClass)
         return (
             <div className={addClass}>
                 <label> {name}: <input id={id}  name={name} value={importedValue} type={type} onBlur={onBlur} onChange={onChange} className={addClass}></input> <span className='hide err'> Err Msg </span> </label>
