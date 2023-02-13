@@ -306,6 +306,7 @@ class FireWallDetailsForm extends React.Component{
         const numberRegex = /\d+/g;
         const baseID = container.id.replace(numberRegex, '');
         const parentID = container.parentElement.id.replace(numberRegex, '')
+        const gparentID = container.parentElement.parentElement.id.replace(numberRegex, '')
         const gGGrandparentID = container.parentElement.parentElement.parentElement.id.replace(numberRegex, '')
 
         // if it's undefined, set it to the current hovered element. Else, check whether the current element is different to the lasthoveredelement
@@ -315,6 +316,9 @@ class FireWallDetailsForm extends React.Component{
             }
             else if (ContainerTypes[parentID]){
                 lastHoveredElement = container.parentElement;
+            }
+            else if (ContainerTypes[gparentID]){
+                lastHoveredElement = container.parentElement.parentElement;
             }
             else if (ContainerTypes[gGGrandparentID]){
                 lastHoveredElement = container.parentElement.parentElement.parentElement;
@@ -334,6 +338,9 @@ class FireWallDetailsForm extends React.Component{
             }
             else if (ContainerTypes[parentID]){
                 lastHoveredElement = container.parentElement;
+            }
+            else if (ContainerTypes[gparentID]){
+                lastHoveredElement = container.parentElement.parentElement;
             }
             else if (ContainerTypes[gGGrandparentID]){
                 lastHoveredElement = container.parentElement.parentElement.parentElement;
