@@ -384,19 +384,9 @@ const ContainerTypes = {
             Name: "Key Lifetime (Seconds)",
             Validation: "text",
         },
+    },
 
-        FirewallPolicy: {
-
-        }
-
-
-
-
-
-
-
-
-
+    FirewallPolicy: {
 
     }
 
