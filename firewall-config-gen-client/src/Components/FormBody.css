@@ -1,0 +1,24 @@
+#submit {
+    border-radius: 5px;
+    border-color:rgb(103, 80, 130);
+    color:white;
+    background-color: rgb(139, 109, 174);
+    padding: 20px 10px;
+    margin: 10px;
+    font-size: large;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    width: 620px;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right:auto;
+    text-align: center;
+}
+
+#submit:hover{
+    cursor:pointer;
+    border: 4px solid rgb(96, 76, 118);
+    background-color:  rgb(121, 94, 152);
+}

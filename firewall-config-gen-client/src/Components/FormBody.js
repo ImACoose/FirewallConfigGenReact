@@ -768,16 +768,7 @@ class FireWallDetailsForm extends React.Component{
                     <button type ='button' onClick={()=> addContainer("PFInformation")}> Add Port Forwarding! </button>
                     <button type ='button' onClick={()=> addContainer("VPNInformation")}> Add VPN! </button>
                 </SidebarOptions>
-
-            
-
-          
-                <CreateInput
-                        type="reader"
-                        onChange={this.ImportData}>
-                </CreateInput>
-        
-                <button type = 'submit'> Submit </button>
+                <button type = 'submit' id='submit'> Generate Config </button>
             </form>
         )
     }
