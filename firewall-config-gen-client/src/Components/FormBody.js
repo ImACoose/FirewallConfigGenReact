@@ -55,7 +55,7 @@ class FireWallDetailsForm extends React.Component{
         NewData["FirewallDefaults"] = {}
         NewData["NativeVLANInformation"] = {}
 
-        Object.keys(ContainerTypes.FirewallDefaults).forEach(function(keyname, keyindex){
+        Object.keys(ContainerTypes.FirewallDefaults).map(function(keyname, keyindex){
             if (ContainerTypes.FirewallDefaults[keyname].Name){
                 if (ContainerTypes.FirewallDefaults[keyname].InputType === "text"){
                     NewData["FirewallDefaults"][keyname] = "";
@@ -80,7 +80,7 @@ class FireWallDetailsForm extends React.Component{
             }
         })
 
-        Object.keys(ContainerTypes.NativeVLANInformation).forEach(function(keyname, keyindex){
+        Object.keys(ContainerTypes.NativeVLANInformation).map(function(keyname, keyindex){
             if (ContainerTypes.NativeVLANInformation[keyname].Name){
                 if (ContainerTypes.NativeVLANInformation[keyname].InputType === "text"){
                     NewData["NativeVLANInformation"][keyname] = "";
@@ -169,7 +169,12 @@ class FireWallDetailsForm extends React.Component{
             
             const spanElement = label.getElementsByTagName('span')[0]
             if (regexUsed){
+                console.log("thhe value of the element is " + element.value)
                 const matches = regexUsed.test(element.value) //dunno why i need to do this first
+                console.log(matches)
+                console.log("logging the match before change")
+                console.log(match)
+
                 if (matches == false){
                     console.log("getting set to false in the regex test")
                     match = false
@@ -236,7 +241,7 @@ class FireWallDetailsForm extends React.Component{
         console.log(containerID)
         console.log(containerType)
 
-        Object.keys(ContainerTypes[containerType]).forEach(function(keyname, keyindex){
+        Object.keys(ContainerTypes[containerType]).map(function(keyname, keyindex){
             console.log(ContainerTypes[containerType][keyname])
             if (ContainerTypes[containerType][keyname].Name){
                 if (ContainerTypes[containerType][keyname].InputType === "text"){
