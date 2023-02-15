@@ -32,6 +32,10 @@
     height: 800px;
 }
 
+.FirewallPolicyInformation {
+    height: 600px;
+}
+
 .Container:hover {
     border: 2px solid rgb(158, 116, 166);
     box-shadow: 5px 5px 0 0 rgb(124, 92, 135);

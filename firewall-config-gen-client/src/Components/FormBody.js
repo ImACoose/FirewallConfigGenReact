@@ -30,6 +30,7 @@ const errMsgs = {
 // regex for validation
 const regex = {
     ipv4: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+    ipv4CIDR:"",
     text: /^[a-zA-Z0-9_-]{4,15}$/,
     password: /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{4,32}$/g, //keeps coming up as true and false
     //vlanId: /^[2-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-4][0][0-9][0-4]$/,
@@ -43,6 +44,7 @@ const IncrementMapping = {
     VLANInformation: "vlanIncrement",
     PFInformation: "pfIncrement",
     VPNInformation: "vpnIncrement",
+    FirewallPolicyInformation: "fpIncrement",
 }
 
 
@@ -120,6 +122,7 @@ class FireWallDetailsForm extends React.Component{
             vlanIncrement: 0,
             pfIncrement: 0,
             vpnIncrement: 0,
+            fpIncrement: 0,
             sidebarTop: 120,
             sidebarLeft:279,
             width: 0,
@@ -151,7 +154,6 @@ class FireWallDetailsForm extends React.Component{
         // ensure the element is not a checkbox or select, and not hidden
         console.log(element.classList[0])
         if (element.type !== "select" && element.type !== "checkbox" && element.classList[0] !== "hide"){
-            console.log(element)
             // first, find the validation type of that element
             // to do this, we need to find the Container
             // with how things are set out, needs to be the grandparent (element stored in label, stored in div, stored in container)
@@ -163,17 +165,10 @@ class FireWallDetailsForm extends React.Component{
         
             const regexUsed = regex[validationType]
             const label = element.parentElement;
-
-            console.log("checking regex")
-            console.log(regexUsed)
             
             const spanElement = label.getElementsByTagName('span')[0]
             if (regexUsed){
-                console.log("thhe value of the element is " + element.value)
                 const matches = regexUsed.test(element.value) //dunno why i need to do this first
-                console.log(matches)
-                console.log("logging the match before change")
-                console.log(match)
 
                 if (matches == false){
                     console.log("getting set to false in the regex test")
@@ -191,9 +186,6 @@ class FireWallDetailsForm extends React.Component{
                 console.log(match)
             }
 
-            console.log("printing match")
-            console.log(match)
-
             if (match === false){
                 element.classList.add('error');
                 spanElement.classList.remove('hide')
@@ -203,7 +195,6 @@ class FireWallDetailsForm extends React.Component{
                 element.classList.remove('error')
                 spanElement.classList.add('hide')
             }
-            console.log(element.classList)
         }
        return match;
     }
@@ -238,9 +229,6 @@ class FireWallDetailsForm extends React.Component{
 
         newSaved[containerID] = {}
 
-        console.log(containerID)
-        console.log(containerType)
-
         Object.keys(ContainerTypes[containerType]).map(function(keyname, keyindex){
             console.log(ContainerTypes[containerType][keyname])
             if (ContainerTypes[containerType][keyname].Name){
@@ -257,7 +245,6 @@ class FireWallDetailsForm extends React.Component{
                     const checkboxArray = ContainerTypes[containerType][keyname].checkboxArray
 
                     checkboxArray.forEach(element => {
-                        console.log(element)
                         newSaved[containerID][keyname][element] = false
                     });
                 }
@@ -772,6 +759,7 @@ class FireWallDetailsForm extends React.Component{
                     }
                     <button type ='button' onClick={()=> addContainer("PFInformation")}> Add Port Forwarding! </button>
                     <button type ='button' onClick={()=> addContainer("VPNInformation")}> Add VPN! </button>
+                    <button type ='button' onClick={()=> addContainer("FirewallPolicyInformation")}> Add Firewall Policy! </button>
                 </SidebarOptions>
                 <button type = 'submit' id='submit'> Generate Config </button>
             </form>

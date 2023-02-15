@@ -386,7 +386,38 @@ const ContainerTypes = {
         },
     },
 
-    FirewallPolicy: {
+    FirewallPolicyInformation: {
+        Name: "Firewall Policy Information",
+
+        Protocol: {
+            ID: "Protocol",
+            InputType: "select",
+            Name: "Protocol (TCP/UDP)",
+            SelectOptions: ["TCP", "UDP"],
+        },
+        // ipv4 altered - optional, but if something is there, must fit ipv4 regex
+        SourceIpv4Address: {
+            ID: "SourceIpv4Address",
+            InputType: "text",
+            Name: "Source Ipv4 Address",
+            Validation: "ipv4CIDRAltered",
+        },
+
+        DestinationIpv4Address: {
+            ID: "DestinationIpv4Address",
+            InputType: "text",
+            Name: "Destination Ipv4 Address",
+            Validation: "ipv4CIDRAltered",
+        },
+
+        TrafficAllowed: {
+            ID: "TrafficAllowed",
+            InputType: "select",
+            Name: "Traffic Allowed",
+            SelectOptions: ["Allow", "Deny"],
+        },
+
+        
 
     }
 
