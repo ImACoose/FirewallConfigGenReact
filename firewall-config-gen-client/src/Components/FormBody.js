@@ -22,6 +22,7 @@ const errMsgs = {
     text: "Must contain only alphanumeric characters, -, _ and be between " + minimum + " - " + maximum + " characters long with no spaces",
     vlanId: "Must be between or equal to 2 and 4095",
     portNo: "Must be between or equal to 1 and 65353",
+    portNoAltered: "Must be blank or between 1 and 65353",
     password: "Must be between 4 - 32 characters",
     suffix: "Must be a valid address",
     bps: "Must be between or equal to 1000 and 1000000",
@@ -193,11 +194,13 @@ class FireWallDetailsForm extends React.Component{
                 }
             }
             else if (validationType === "ipv4CIDRAltered"){
-                console.log("found")
                 if (element.value.length > 0){
-                    console.log("there is a value")
                     match = regex.ipv4CIDR.test(element.value)
-                    console.log(match)
+                }
+            }
+            else if (validationType === "portNoAltered"){
+                if (element.value.length > 0){
+                    match = this.validateRange(element, 1, 65353)
                 }
             }
 
@@ -471,7 +474,7 @@ class FireWallDetailsForm extends React.Component{
         console.log(this.state.formData)
         event.preventDefault();
         var ableToSubmit = this.validateAll();
-        ableToSubmit = true
+        ableToSubmit = true // doing this for testing purposes, remove in final version
 
         if (ableToSubmit === true){
             // send  a request to this specific URL

@@ -395,6 +395,14 @@ const ContainerTypes = {
             Name: "Protocol (TCP/UDP)",
             SelectOptions: ["TCP", "UDP"],
         },
+
+        PortNumber:{
+            ID: "PortNumber",
+            InputType: "text",
+            Name: "Port Number",
+            Validation: "portNoAltered",
+        },
+
         // ipv4 altered - optional, but if something is there, must fit ipv4 regex
         SourceIpv4Address: {
             ID: "SourceIpv4Address",
