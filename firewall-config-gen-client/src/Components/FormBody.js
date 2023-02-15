@@ -17,6 +17,8 @@ var lastHoveredElement;
 // error msgs for validation
 const errMsgs = {
     ipv4: "Must be a valid IP Address",
+    ipv4Altered: "Must be blank or a valid IP Address",
+    ipv4CIDRAltered: "Must be blank, a valid IP Address, or a valid IP with CIDR notation",
     text: "Must contain only alphanumeric characters, -, _ and be between " + minimum + " - " + maximum + " characters long with no spaces",
     vlanId: "Must be between or equal to 2 and 4095",
     portNo: "Must be between or equal to 1 and 65353",
@@ -30,7 +32,7 @@ const errMsgs = {
 // regex for validation
 const regex = {
     ipv4: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
-    ipv4CIDR:"",
+    ipv4CIDR:/^([0-9]{1,3}\.){3}[0-9]{1,3}($|\/(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32))$/,
     text: /^[a-zA-Z0-9_-]{4,15}$/,
     password: /^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{4,32}$/, //keeps coming up as true and false
     //vlanId: /^[2-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-4][0][0-9][0-4]$/,
@@ -184,6 +186,19 @@ class FireWallDetailsForm extends React.Component{
             else if (validationType === "bps"){
                 match = this.validateRange(element, 1000, 1000000)
                 console.log(match)
+            }
+            else if (validationType === "ipv4Altered"){
+                if (element.value.length > 0){
+                    match = regex.ipv4.test(element.value)
+                }
+            }
+            else if (validationType === "ipv4CIDRAltered"){
+                console.log("found")
+                if (element.value.length > 0){
+                    console.log("there is a value")
+                    match = regex.ipv4CIDR.test(element.value)
+                    console.log(match)
+                }
             }
 
             if (match === false){
