@@ -92,7 +92,7 @@ function generateConfig(configFormJSON) {
     var native_dhcpv4_end_address = configFormJSON.NativeVLANInformation["DHCPv4EndAddress"];
     var native_ipv4_cidr = configFormJSON.NativeVLANInformation.CIDR
     var native_vlan_zone = configFormJSON.NativeVLANInformation.Zone
-    var lan_interface = interface_map[model];
+    var lan_interface = interface_map[model]; // different firewall models have either lan or internal. this is used to distinguish between
     var native_ipv4_network_address = getNetworkAddress(native_ipv4_address, native_ipv4_mask);
 
     // these are the optional variables that may or may not be passed through, and multiple of them may exist
@@ -100,18 +100,19 @@ function generateConfig(configFormJSON) {
     var vlans = {};
     var trusted_interfaces = {};
     var dhcpPools = {};
+    var firewallPolicies = {};
 
     console.log(configFormJSON)
 
 
     // configIndex refers to each big item being submitted. for example, firewalldefaults, nativevlan and vlaninformation are all 'config indexes'
     for (const configIndex in configFormJSON) {
-      console.log("this is the config index " + configIndex)
 
       // this checks whether the index contains VLANINformation, so it may split VLANInformation4 into VLANInformation and 4
       var configIndexSplit = configIndex.split("VLANInformation");
+      var configIndexFirewallSplit = configIndex.split("FirewallPolicyInformation")
 
-      // if it does have 'VLANInformation, add it to the vlans table
+      // if it does have 'VLANInformation', add it to the vlans table
       if (configIndexSplit[0] === "") {
         vlans[configIndex] = {
           // these are each the values that may be pased through
@@ -140,6 +141,16 @@ function generateConfig(configFormJSON) {
             mask: cidrToSubnetMask(`0.0.0.0${configFormJSON[configIndex].CIDR}`)
           };
         };
+      }
+      else if (configIndexFirewallSplit[0] === ""){
+        // we found a firewall policy
+        firewallPolicies[configIndexFirewallSplit[1]] = {
+          protocol: configFormJSON[configIndex].Protocol,
+          port_number: configFormJSON[configIndex].PortNumber,
+          source_ipv4_address: configFormJSON[configIndex].SourceIpv4Address,
+          destination_ipv4_address: configFormJSON[configIndex].DestinationIpv4Address,
+          traffic_allowed: configFormJSON[configIndex].TrafficAllowed,
+        }
       };
     };
 
@@ -163,6 +174,7 @@ function generateConfig(configFormJSON) {
     timezone = timezone_map[timezone];
 
     console.log(zones)
+    console.log(firewallPolicies)
 
     var success = true;
 

@@ -17,8 +17,9 @@ config system admin
         set password "{{ admin_password }}"
     next
 end
+### use {} to insert a value. quotations can be used around this to indicate it's a string
 config system dns
-    set primary {{ primary_ipv4_dns }}
+    set primary {{ primary_ipv4_dns }} 
     set secondary {{ secondary_ipv4_dns }}
     set protocol cleartext
 end
