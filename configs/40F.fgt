@@ -182,4 +182,23 @@ config firewall address
         set subnet {{ vlan.ipv4_network_address }} {{ vlan.ipv4_mask }}
     next
     {%- endfor %}
+    {%- for addressObject in unique_addresses %}
+    edit "{{ addressObject.objectName }}"
+        set type ipmask
+        set associated-interface "any"
+        set subnet {{ addressObject.networkAddress }} {{ addressObject.mask }}
+    next
+    {%- endfor %}
+end
+config firewall policy
+    {%- for index, policy in firewall_policies %}
+    delete {{ index }}
+    edit {{ index }}
+        set name blablabla
+        set srcintf "z-{{ policy.src_zone }}"
+        set dstintf "z-{{ policy.dst_zone }}"
+        set srcaddr "{{ policy.source_ipv4_address }}"
+        set dstaddr "{{ policy.destination_ipv4_address }}"
+    next
+    {%- endfor %}
 end

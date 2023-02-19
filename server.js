@@ -168,7 +168,7 @@ function generateConfig(configFormJSON) {
           protocol: configFormJSON[configIndex].Protocol,
           port_number: configFormJSON[configIndex].PortNumber,
           source_ipv4_address: source_ipv4_address,
-          destination_ipv4_address: configFormJSON[configIndex].DestinationIpv4Address,
+          destination_ipv4_address: configFormJSON[configIndex].DestinationIpv4Address ? configFormJSON[configIndex].DestinationIpv4Address : "all",
           traffic_allowed: configFormJSON[configIndex].TrafficAllowed,
         };
 
@@ -289,7 +289,9 @@ function generateConfig(configFormJSON) {
       secondary_ipv4_dns: secondaryIPv4DNS,
       native_ipv4_cidr: native_ipv4_cidr,
       native_vlan_zone: native_vlan_zone,
-      native_ipv4_network_address: native_ipv4_network_address
+      native_ipv4_network_address: native_ipv4_network_address,
+      unique_addresses: uniqueAddresses,
+      firewall_policies: firewallPolicies
     });
 
     fs.writeFile(`./output/${hostname}.fgt`, template, function(err) {
