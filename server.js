@@ -66,7 +66,16 @@ function getNetworkAddress(ipAddress, subnetMask) {
   }
 
   return networkAddress.join(".");
-}
+};
+
+function isIpAddressInSubnet(ipAddress, subnetMask, targetIpAddress) {
+  const ipAddressParts = ipAddress.split('.').map(part => parseInt(part, 10));
+  const subnetMaskParts = subnetMask.split('.').map(part => parseInt(part, 10));
+  const targetIpAddressParts = targetIpAddress.split('.').map(part => parseInt(part, 10));
+  const networkAddressParts = ipAddressParts.map((part, index) => part & subnetMaskParts[index]);
+
+  return networkAddressParts.every((part, index) => part === (targetIpAddressParts[index] & subnetMaskParts[index]));
+};
 
 // generates a text file with the router configuration
 function generateConfig(configFormJSON) {
@@ -102,7 +111,7 @@ function generateConfig(configFormJSON) {
     var dhcpPools = {};
     var firewallPolicies = {};
 
-    console.log(configFormJSON)
+    //console.log(configFormJSON)
 
 
     // configIndex refers to each big item being submitted. for example, firewalldefaults, nativevlan and vlaninformation are all 'config indexes'
@@ -141,16 +150,57 @@ function generateConfig(configFormJSON) {
             mask: cidrToSubnetMask(`0.0.0.0${configFormJSON[configIndex].CIDR}`)
           };
         };
-      }
-      else if (configIndexFirewallSplit[0] === ""){
-        // we found a firewall policy
+      };
+    };
+
+    for (const configIndex in configFormJSON) {
+      var configIndexFirewallSplit = configIndex.split("FirewallPolicyInformation");
+
+      if (configIndexFirewallSplit[0] === ""){
         firewallPolicies[configIndexFirewallSplit[1]] = {
           protocol: configFormJSON[configIndex].Protocol,
           port_number: configFormJSON[configIndex].PortNumber,
           source_ipv4_address: configFormJSON[configIndex].SourceIpv4Address,
           destination_ipv4_address: configFormJSON[configIndex].DestinationIpv4Address,
           traffic_allowed: configFormJSON[configIndex].TrafficAllowed,
-        }
+        };
+
+        var fwSourceIPv4 = firewallPolicies[configIndexFirewallSplit[1]].source_ipv4_address;
+        var fwDestinationIPv4 = firewallPolicies[configIndexFirewallSplit[1]].destination_ipv4_address;
+        var src_zone = null;
+        var dst_zone = "wan";
+
+        // getting zone
+        for (const vlanIndex in vlans) {
+          var vlanIPv4Address = vlans[vlanIndex].ipv4_address;
+          var vlanIPv4Mask = vlans[vlanIndex].ipv4_mask;
+
+          // we want to check whether the destination or source address fit in the network, if so use the zone associated with this vlan.
+          // if dest does not, it wan
+
+          if (isIpAddressInSubnet(vlanIPv4Address, vlanIPv4Mask, fwSourceIPv4)) {
+            src_zone = vlans[vlanIndex].zone;
+          };
+
+          if (isIpAddressInSubnet(vlanIPv4Address, vlanIPv4Mask, fwDestinationIPv4)) {
+            dst_zone = vlans[vlanIndex].zone;
+          };
+        };
+
+        if (!src_zone) {
+          if (isIpAddressInSubnet(native_ipv4_address, native_ipv4_mask, fwSourceIPv4)) {
+            src_zone = native_vlan_zone;
+          };
+        };
+
+        if (!dst_zone) {
+          if (isIpAddressInSubnet(native_ipv4_address, native_ipv4_mask, fwDestinationIPv4)) {
+            dst_zone = native_vlan_zone;
+          };
+        };
+
+        firewallPolicies[configIndexFirewallSplit[1]].src_zone = src_zone;
+        firewallPolicies[configIndexFirewallSplit[1]].dst_zone = dst_zone;
       };
     };
 
@@ -173,7 +223,7 @@ function generateConfig(configFormJSON) {
 
     timezone = timezone_map[timezone];
 
-    console.log(zones)
+    //console.log(zones)
     console.log(firewallPolicies)
 
     var success = true;
