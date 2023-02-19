@@ -110,6 +110,7 @@ function generateConfig(configFormJSON) {
     var trusted_interfaces = {};
     var dhcpPools = {};
     var firewallPolicies = {};
+    var uniqueAddresses = {};
 
     //console.log(configFormJSON)
 
@@ -201,6 +202,35 @@ function generateConfig(configFormJSON) {
 
         firewallPolicies[configIndexFirewallSplit[1]].src_zone = src_zone;
         firewallPolicies[configIndexFirewallSplit[1]].dst_zone = dst_zone;
+      };
+    };
+
+    for (const policyIndex in firewallPolicies) {
+      const srcIPv4Address = firewallPolicies[policyIndex].source_ipv4_address;
+      const dstIPv4Address = firewallPolicies[policyIndex].destination_ipv4_address;
+
+      const srcIPv4AddressNoCIDR = srcIPv4Address.split("/")
+      const dstIPv4AddressNoCiDR = dstIPv4Address.split("/")
+
+      var dstStored = false;
+      var srcStored = false;
+
+      for (let i = 0; i < uniqueAddresses.length; i++) {
+        if (uniqueAddresses[i].objectName == srcIPv4Address) {
+          srcStored = true;
+        };
+
+        if (uniqueAddresses[i].objectName == dstIPv4Address) {
+          dstStored = true;
+        };
+      };
+
+      if (srcStored == false) { 
+        // save src details
+      };
+
+      if (dstStored == false) {
+        // save dst details
       };
     };
 
