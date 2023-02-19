@@ -110,7 +110,7 @@ function generateConfig(configFormJSON) {
     var trusted_interfaces = {};
     var dhcpPools = {};
     var firewallPolicies = {};
-    var uniqueAddresses = {};
+    var uniqueAddresses = [];
 
     //console.log(configFormJSON)
 
@@ -158,10 +158,16 @@ function generateConfig(configFormJSON) {
       var configIndexFirewallSplit = configIndex.split("FirewallPolicyInformation");
 
       if (configIndexFirewallSplit[0] === ""){
+        var source_ipv4_address = configFormJSON[configIndex].SourceIpv4Address
+
+        if (!source_ipv4_address.split("/")[1]) {
+          source_ipv4_address = source_ipv4_address + "/32";
+        }
+
         firewallPolicies[configIndexFirewallSplit[1]] = {
           protocol: configFormJSON[configIndex].Protocol,
           port_number: configFormJSON[configIndex].PortNumber,
-          source_ipv4_address: configFormJSON[configIndex].SourceIpv4Address,
+          source_ipv4_address: source_ipv4_address,
           destination_ipv4_address: configFormJSON[configIndex].DestinationIpv4Address,
           traffic_allowed: configFormJSON[configIndex].TrafficAllowed,
         };
@@ -208,10 +214,8 @@ function generateConfig(configFormJSON) {
     for (const policyIndex in firewallPolicies) {
       const srcIPv4Address = firewallPolicies[policyIndex].source_ipv4_address;
       const dstIPv4Address = firewallPolicies[policyIndex].destination_ipv4_address;
-
       const srcIPv4AddressNoCIDR = srcIPv4Address.split("/")
       const dstIPv4AddressNoCiDR = dstIPv4Address.split("/")
-
       var dstStored = false;
       var srcStored = false;
 
@@ -225,12 +229,24 @@ function generateConfig(configFormJSON) {
         };
       };
 
-      if (srcStored == false) { 
-        // save src details
+      if (srcStored == false && srcIPv4Address) { 
+        const policyMask = cidrToSubnetMask(`0.0.0.0/${srcIPv4AddressNoCIDR[1]}`)
+
+        uniqueAddresses.push({
+          objectName: srcIPv4Address,
+          networkAddress: getNetworkAddress(srcIPv4Address, policyMask),
+          mask: policyMask
+        });
       };
 
-      if (dstStored == false) {
-        // save dst details
+      if (dstStored == false && dstIPv4Address) {
+        const policyMask = cidrToSubnetMask(`0.0.0.0/${srcIPv4AddressNoCIDR[1]}`)
+
+        uniqueAddresses.push({
+          objectName: dstIPv4Address,
+          networkAddress: getNetworkAddress(dstIPv4Address, policyMask),
+          mask: policyMask
+        });
       };
     };
 
@@ -252,9 +268,6 @@ function generateConfig(configFormJSON) {
     };
 
     timezone = timezone_map[timezone];
-
-    //console.log(zones)
-    console.log(firewallPolicies)
 
     var success = true;
 
