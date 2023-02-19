@@ -7,10 +7,13 @@ const { config } = require("process");
 const app = express();
 const port = process.env.port || 3001;
 
+//sets up the templating engine
 const templateEngine = nunjucks.configure("./configs", {
   autoescape: true
 });
 
+
+// allows the server to use CORS to have the local host post to it
 app.use(express.json());
 app.use(cors({
     origin: "http://localhost:3000"
@@ -26,6 +29,7 @@ const interface_map = {
   "80F": "internal"
 };
 
+// converts a /(insert number) to a subnet mask e.g (255.255.255.0)
 function cidrToSubnetMask(cidr) {
   var mask = "";
   var parts = cidr.split("/");
@@ -45,6 +49,7 @@ function cidrToSubnetMask(cidr) {
   return mask.substring(0, mask.length - 1);
 }
 
+// gets the network address from the ip address and the subnet mask
 function getNetworkAddress(ipAddress, subnetMask) {
   const ip = ipAddress.split(".").map(function (num) {
     return parseInt(num, 10);
@@ -63,7 +68,9 @@ function getNetworkAddress(ipAddress, subnetMask) {
   return networkAddress.join(".");
 }
 
+// generates a text file with the router configuration
 function generateConfig(configFormJSON) {
+  // these are all static variables, guaranteed to be passed through upon submission (although some may be empty)
     var hostname = configFormJSON.FirewallDefaults["HostName"];
     var adminUsername = configFormJSON.FirewallDefaults["AdminUsername"];
     var adminPassword = configFormJSON.FirewallDefaults["AdminPassword"];
@@ -87,6 +94,8 @@ function generateConfig(configFormJSON) {
     var native_vlan_zone = configFormJSON.NativeVLANInformation.Zone
     var lan_interface = interface_map[model];
     var native_ipv4_network_address = getNetworkAddress(native_ipv4_address, native_ipv4_mask);
+
+    // these are the optional variables that may or may not be passed through, and multiple of them may exist
     var zones = {};
     var vlans = {};
     var trusted_interfaces = {};
@@ -94,11 +103,18 @@ function generateConfig(configFormJSON) {
 
     console.log(configFormJSON)
 
+
+    // configIndex refers to each big item being submitted. for example, firewalldefaults, nativevlan and vlaninformation are all 'config indexes'
     for (const configIndex in configFormJSON) {
+      console.log("this is the config index " + configIndex)
+
+      // this checks whether the index contains VLANINformation, so it may split VLANInformation4 into VLANInformation and 4
       var configIndexSplit = configIndex.split("VLANInformation");
 
+      // if it does have 'VLANInformation, add it to the vlans table
       if (configIndexSplit[0] === "") {
         vlans[configIndex] = {
+          // these are each the values that may be pased through
           vlan_id: configFormJSON[configIndex].VLANID,
           ipv4_address: configFormJSON[configIndex].IPv4Address,
           ipv4_mask: cidrToSubnetMask(`0.0.0.0${configFormJSON[configIndex].CIDR}`),
@@ -107,6 +123,7 @@ function generateConfig(configFormJSON) {
           ipv4_cidr: configFormJSON[configIndex].CIDR,
           ipv4_network_address: getNetworkAddress(configFormJSON[configIndex].IPv4Address, cidrToSubnetMask(`0.0.0.0${configFormJSON[configIndex].CIDR}`))
         };
+        
 
         if (zones[configFormJSON[configIndex].Zone]) {
           zones[configFormJSON[configIndex].Zone] = zones[configFormJSON[configIndex].Zone] + ` "VLAN${configFormJSON[configIndex].VLANID}"`;
@@ -114,6 +131,7 @@ function generateConfig(configFormJSON) {
           zones[configFormJSON[configIndex].Zone] = `"VLAN${configFormJSON[configIndex].VLANID}"`;
         };
 
+        // if DHCPv4 enabled is true, fill in the start and end address
         if (configFormJSON[configIndex].DHCPv4Enabled) {
           dhcpPools[`VLAN${configFormJSON[configIndex].VLANID}`] = {
             dhcpv4_start_address: configFormJSON[configIndex].DHCPv4StartAddress,
@@ -125,12 +143,14 @@ function generateConfig(configFormJSON) {
       };
     };
 
+    // add to the zones table if the vlan has zones
     if (zones[configFormJSON.NativeVLANInformation.Zone]) {
       zones[configFormJSON.NativeVLANInformation.Zone] = zones[configFormJSON.NativeVLANInformation.Zone] + ` "${lan_interface}"`;
     } else {
       zones[configFormJSON.NativeVLANInformation.Zone] + ` "${lan_interface}"`;
     }
 
+    // if dhcpv4 is enabled, do stuff on native vlan
     if (native_dhcpv4_enabled) {
       dhcpPools[lan_interface] = {
         dhcpv4_start_address: native_dhcpv4_start_address,
@@ -146,6 +166,7 @@ function generateConfig(configFormJSON) {
 
     var success = true;
 
+    // this renders the actual template
     const template = templateEngine.render(`${model}.fgt`, {
       hostname: hostname,
       vlans: vlans,
@@ -175,6 +196,7 @@ function generateConfig(configFormJSON) {
     return success;
 };
 
+// upon submission/posting to /generate, the configform is set to the request's body, and the generateConfig function is called on it
 app.post("/generate", (req, res) => {
   const configFormJSON = req.body;
   var success = generateConfig(configFormJSON);
